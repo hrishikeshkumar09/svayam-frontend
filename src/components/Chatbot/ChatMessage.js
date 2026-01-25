@@ -146,16 +146,32 @@ import PersonIcon from '@mui/icons-material/Person';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import ReactMarkdown from "react-markdown";
 
+// const formatTime = (t) => {
+//   if (!t) return "";
+//   try {
+//     return new Date(t).toLocaleTimeString("en-US", {
+//       hour: "2-digit",
+//       minute: "2-digit",
+//     });
+//   } catch (e) {
+//     // If t is already formatted (e.g., "09:11 AM"), new Date() might fail.
+//     // In that case, just return t as is.
+//     return t;
+//   }
+// };
+
+// Time Formatting Helper
 const formatTime = (t) => {
   if (!t) return "";
   try {
-    return new Date(t).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    let dateStr = t;
+    if (typeof t === 'string' && t.includes('T') && !t.endsWith('Z') && !t.includes('+')) {
+        dateStr += 'Z'; 
+    }
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return t;
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   } catch (e) {
-    // If t is already formatted (e.g., "09:11 AM"), new Date() might fail.
-    // In that case, just return t as is.
     return t;
   }
 };
@@ -225,6 +241,8 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         gap: 1.5,
         px: 2,
         width: "100%",
+        position: "relative",
+        zIndex: 2,
       }}
     >
       {/* Assistant Avatar */}
@@ -245,29 +263,41 @@ const ChatMessage = ({ message, sender, timestamp }) => {
       {/* Message Bubble */}
       <Box sx={{ maxWidth: "70%", display: "flex", flexDirection: "column" }}>
         <Paper
-          elevation={0}
+          elevation={1}
           sx={{
+            // p: 2,
+            // background: isUser
+            //   ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+            //   : "#ffffff",
+            // color: isUser ? "white" : "#1e293b",
+            // borderRadius: isUser
+            //   ? "16px 16px 4px 16px"
+            //   : "16px 16px 16px 4px",
+            // border: isUser ? "none" : "1px solid #e5e7eb",
+            // boxShadow: isUser 
+            //   ? "0 4px 12px rgba(102, 126, 234, 0.25)" 
+            //   : "0 1px 3px rgba(0,0,0,0.08)",
+            // width: "fit-content",
+            // maxWidth: "100%",
+            // overflowWrap: "break-word",
+            // transition: "all 0.2s ease",
+            // "&:hover": {
+            //   boxShadow: isUser 
+            //     ? "0 6px 16px rgba(102, 126, 234, 0.35)" 
+            //     : "0 2px 8px rgba(0,0,0,0.12)",
+            // },
             p: 2,
-            background: isUser
-              ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-              : "#ffffff",
-            color: isUser ? "white" : "#1e293b",
-            borderRadius: isUser
-              ? "16px 16px 4px 16px"
-              : "16px 16px 16px 4px",
-            border: isUser ? "none" : "1px solid #e5e7eb",
-            boxShadow: isUser 
-              ? "0 4px 12px rgba(102, 126, 234, 0.25)" 
-              : "0 1px 3px rgba(0,0,0,0.08)",
-            width: "fit-content",
-            maxWidth: "100%",
-            overflowWrap: "break-word",
-            transition: "all 0.2s ease",
-            "&:hover": {
-              boxShadow: isUser 
-                ? "0 6px 16px rgba(102, 126, 234, 0.35)" 
-                : "0 2px 8px rgba(0,0,0,0.12)",
-            },
+            maxWidth: "75%",
+            borderRadius: 3,
+            // ✅ FIX 2: Solid Colors (Not Transparent)
+            // User = Indigo, AI = Pure White
+            bgcolor: isUser ? indigo[600] : "#ffffff", 
+            color: isUser ? "#fff" : "#1e293b",
+            borderTopRightRadius: isUser ? 0 : 12,
+            borderTopLeftRadius: !isUser ? 0 : 12,
+            // ✅ FIX 3: Add border to separate white card from white background
+            border: isUser ? "none" : "1px solid #e2e8f0",
+            boxShadow: isUser ? "none" : "0 2px 4px rgba(0,0,0,0.05)",
           }}
         >
           {safeMessage ? (
