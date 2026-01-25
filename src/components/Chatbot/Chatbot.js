@@ -2076,6 +2076,85 @@ const handleHomeScreenEnter = () => {
 
   const showHomeScreen = !currentConversation;
 
+  // if (showHomeScreen) {
+  //   return (
+  //     <Box
+  //       sx={{
+  //         flexGrow: 1,
+  //         display: "flex",
+  //         flexDirection: "column",
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //         height: "100%",
+  //         // Brain Background Image
+  //         backgroundImage: `url(${brainBg})`, // Tech/Brain Network placeholder
+  //         backgroundSize: "cover",
+  //         backgroundPosition: "center",
+  //         backgroundRepeat: "no-repeat",
+  //         position: "relative",
+  //       }}
+  //     >
+  //       {/* Dark Overlay to ensure text readability */}
+  //       <Box
+  //         sx={{
+  //           position: "absolute",
+  //           top: 0,
+  //           left: 0,
+  //           right: 0,
+  //           bottom: 0,
+  //           backgroundColor: "rgba(0, 0, 0, 0.6)", // Darkens the background
+  //           zIndex: 1,
+  //         }}
+  //       />
+
+  //       {/* Branding Text */}
+  //       <Box sx={{ zIndex: 2, textAlign: "center" }}>
+  //         <Typography
+  //           variant="h2"
+  //           sx={{
+  //             fontWeight: 800,
+  //             color: "#ffffff",
+  //             letterSpacing: "4px",
+  //             textTransform: "uppercase",
+  //             fontSize: { xs: "2.5rem", md: "4rem" },
+  //             textShadow: "0px 4px 20px rgba(0,0,0,0.5)",
+  //             mb: 2,
+  //           }}
+  //         >
+  //           SVAYAM AMS
+  //         </Typography>
+
+  //         <Typography
+  //            variant="h6"
+  //            sx={{
+  //              color: "rgba(255,255,255,0.8)",
+  //              fontWeight: 400,
+  //              letterSpacing: "1px",
+  //              maxWidth: "600px",
+  //              mx: "auto",
+  //            }}
+  //         >
+  //           AI-Powered Enterprise Assistance
+  //         </Typography>
+          
+  //         {/* Optional: Visual Cue to use sidebar */}
+  //         <Typography
+  //            variant="caption"
+  //            sx={{
+  //              display: "block",
+  //              mt: 6,
+  //              color: "rgba(255,255,255,0.5)",
+  //              textTransform: "uppercase",
+  //              letterSpacing: "1.5px",
+  //            }}
+  //         >
+  //           ← Click "New Chat" to begin
+  //         </Typography>
+  //       </Box>
+  //     </Box>
+  //   );
+  // }
+
   if (showHomeScreen) {
     return (
       <Box
@@ -2086,39 +2165,35 @@ const handleHomeScreenEnter = () => {
           alignItems: "center",
           justifyContent: "center",
           height: "100%",
-          // Brain Background Image
-          backgroundImage: `url(${brainBg})`, // Tech/Brain Network placeholder
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+          //bgcolor: "#f8fafc", // Light grey background for the whole page
+          bgcolor: "#ffffff",
           position: "relative",
         }}
       >
-        {/* Dark Overlay to ensure text readability */}
+        {/* LOGO IMAGE */}
         <Box
+          component="img"
+          src={brainLogo} // Or put your URL string here
+          alt="Svayam Logo"
           sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.6)", // Darkens the background
-            zIndex: 1,
+            width: "300px", // ✅ Controls the size of the logo
+            height: "auto",
+            mb: 4, // Spacing between logo and text
+            opacity: 0.9,
           }}
         />
 
         {/* Branding Text */}
         <Box sx={{ zIndex: 2, textAlign: "center" }}>
           <Typography
-            variant="h2"
+            variant="h3"
             sx={{
               fontWeight: 800,
-              color: "#ffffff",
-              letterSpacing: "4px",
+              color: "#1e293b", // Dark text since background is light now
+              letterSpacing: "3px",
               textTransform: "uppercase",
-              fontSize: { xs: "2.5rem", md: "4rem" },
-              textShadow: "0px 4px 20px rgba(0,0,0,0.5)",
-              mb: 2,
+              textShadow: "0px 2px 10px rgba(0,0,0,0.05)",
+              mb: 1,
             }}
           >
             SVAYAM AMS
@@ -2127,25 +2202,23 @@ const handleHomeScreenEnter = () => {
           <Typography
              variant="h6"
              sx={{
-               color: "rgba(255,255,255,0.8)",
+               color: "#64748b",
                fontWeight: 400,
                letterSpacing: "1px",
-               maxWidth: "600px",
-               mx: "auto",
              }}
           >
             AI-Powered Enterprise Assistance
           </Typography>
           
-          {/* Optional: Visual Cue to use sidebar */}
           <Typography
              variant="caption"
              sx={{
                display: "block",
-               mt: 6,
-               color: "rgba(255,255,255,0.5)",
+               mt: 4,
+               color: "#94a3b8",
                textTransform: "uppercase",
                letterSpacing: "1.5px",
+               fontWeight: 600
              }}
           >
             ← Click "New Chat" to begin
@@ -2159,15 +2232,45 @@ const handleHomeScreenEnter = () => {
   // MAIN CHAT INTERFACE
   // ==========================================
   return (
-    <Box
+    // <Box
+    //   sx={{
+    //     flexGrow: 1,
+    //     display: "flex",
+    //     flexDirection: "column",
+    //     height: "100%",
+    //     bgcolor: "#ffffff",
+    //   }}
+    // >
+      <Box
       sx={{
         flexGrow: 1,
         display: "flex",
         flexDirection: "column",
         height: "100%",
+        position: "relative", // Needed for the absolute background
         bgcolor: "#ffffff",
+        overflow: "hidden", // Prevents scrollbar on the container itself
       }}
     >
+      {/* ✅ BACKGROUND WATERMARK */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url(${brainLogo})`, // Use the same logo
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+          backgroundSize: "400px", // Size of the watermark
+          opacity: 0.08, // ✅ Very faint (8% opacity) so text is readable
+          pointerEvents: "none", // Allows clicks to pass through to messages
+          zIndex: 0,
+        }}
+      />
+
+
       {/* HIDDEN FILE INPUTS */}
       <input
         type="file"
