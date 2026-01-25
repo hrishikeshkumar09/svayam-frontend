@@ -141,6 +141,7 @@
 
 // src/components/Chatbot/ChatMessage.js
 import React from 'react';
+import { deepPurple, indigo } from '@mui/material/colors';
 import { Box, Typography, Paper, Avatar } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
