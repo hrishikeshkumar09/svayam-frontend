@@ -1663,7 +1663,7 @@ const Chatbot = ({
       isMounted = false; // <--- CANCEL UPDATE IF USER SWITCHES CHATS
     };
 
-  }, [currentConversation?.conversation_uuid, currentConversation?.messagesLoaded]);
+  }, [currentConversation]);//[currentConversation?.conversation_uuid, currentConversation?.messagesLoaded]);
 
  async function loadConversationMessages(conversationUuid) {
     setLoadingMessages(true);

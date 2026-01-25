@@ -458,6 +458,49 @@ const handleNewChat = async () => {
 
 
   // --- MISSING LOGIC ADDED BACK: Handle Chat from Home Screen ---
+// const handleHomeScreenSend = async (text) => {
+//   if (!text.trim()) return;
+//   if (!currentProject) {
+//     alert("Please select a project first.");
+//     return;
+//   }
+
+//   try {
+//     const data = await startConversation(currentProject);
+
+//     const newConv = {
+//       conversation_uuid: data.conversation_uuid,
+//       topic: data.topic || "New Chat",
+//       startDate: data.created_at || new Date().toISOString(),
+//       isResolved: false,
+//       user: loggedInUser?.userDetails,
+//       messages: [],
+//       messagesLoaded: false,
+//       isNew: true, //loader fix
+//       project: currentProject
+//     };
+
+//     setConversations((prev) => {
+//       const updated = [newConv, ...prev];
+      
+//       // ✅ Update cache
+//       const key = CACHE_KEY(loggedInUser.userDetails, currentProject);
+//       localStorage.setItem(key, JSON.stringify(updated));
+      
+//       return updated;
+//     });
+    
+//     setCurrentConversationId(newConv.conversation_uuid);
+//     window.firstMessageFromHome = text;
+    
+//   } catch (err) {
+//     console.error("Failed to create chat from home:", err);
+//     alert("Could not start a new chat. Please try again.");
+//   }
+// };
+
+// In src/App.js
+
 const handleHomeScreenSend = async (text) => {
   if (!text.trim()) return;
   if (!currentProject) {
@@ -466,33 +509,40 @@ const handleHomeScreenSend = async (text) => {
   }
 
   try {
+    // 1. Create conversation on server FIRST
     const data = await startConversation(currentProject);
 
+    // 2. Create a robust local object
     const newConv = {
       conversation_uuid: data.conversation_uuid,
       topic: data.topic || "New Chat",
       startDate: data.created_at || new Date().toISOString(),
       isResolved: false,
       user: loggedInUser?.userDetails,
-      messages: [],
-      messagesLoaded: false,
-      isNew: true, //loader fix
+      messages: [],        // Start empty
+      messagesLoaded: true, // ✅ IMPORTANT: Tell Chatbot "I have loaded messages (there are none)"
+      isNew: true,          // ✅ IMPORTANT: Tell Chatbot "This is new, don't fetch history"
       project: currentProject
     };
 
+    // 3. Update State & Cache IMMEDIATELY
     setConversations((prev) => {
       const updated = [newConv, ...prev];
       
-      // ✅ Update cache
-      const key = CACHE_KEY(loggedInUser.userDetails, currentProject);
-      localStorage.setItem(key, JSON.stringify(updated));
-      
+      // Save to cache right now so it survives a reload
+      if (loggedInUser?.userDetails && currentProject) {
+        const key = CACHE_KEY(loggedInUser.userDetails, currentProject);
+        localStorage.setItem(key, JSON.stringify(updated));
+      }
       return updated;
     });
-    
-    setCurrentConversationId(newConv.conversation_uuid);
+
+    // 4. Pass the text to Chatbot to send
     window.firstMessageFromHome = text;
-    
+
+    // 5. Switch the view
+    setCurrentConversationId(newConv.conversation_uuid);
+
   } catch (err) {
     console.error("Failed to create chat from home:", err);
     alert("Could not start a new chat. Please try again.");
