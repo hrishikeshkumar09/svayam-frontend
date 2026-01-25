@@ -800,15 +800,15 @@ import StorageIcon from '@mui/icons-material/Storage';
 
 // API Service Imports
 import {
-  fetchKnowledgeBaseTree,
+  getKnowledgeBaseTree as fetchKnowledgeBaseTree, // Aliasing to keep your component code working
   getDownloadUrl,
-  deleteItem,
-  renameItem,
-  triggerIndexer,
-  uploadFiles,
+  deleteKbItem as deleteItem,       // Aliased
+  renameKbItem as renameItem,       // Aliased
+  triggerKbIndexer as triggerIndexer, // Aliased
+  uploadKbFiles as uploadFiles,     // Aliased
   createProject,
   fetchContainers
-} from '../../services/apiKnowledgeBase'; 
+} from '../../services/api'; 
 
 // --- Helper: Find Node in Tree ---
 const findNodeByPath = (nodes, path) => {

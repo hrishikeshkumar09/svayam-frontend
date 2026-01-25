@@ -248,6 +248,14 @@
     );
   }
 
+  export async function getFeedbackStats() {
+    return authorizedFetch(`${API_BASE_URL}/admin/feedback/stats`);
+  }
+
+  export async function listAllFeedback(limit = 50, offset = 0) {
+    return authorizedFetch(`${API_BASE_URL}/admin/feedback/list?limit=${limit}&offset=${offset}`);
+  }
+
   /* -------------------------------------------------
     ADMIN APIs
   ------------------------------------------------- */
@@ -284,15 +292,15 @@ export async function getAllUsers() {
     });
   }
 
-  export async function getFeedbackStats() {
-    return authorizedFetch(`${API_BASE_URL}/admin/feedback/stats`);
-  }
+  // export async function getFeedbackStats() {
+  //   return authorizedFetch(`${API_BASE_URL}/admin/feedback/stats`);
+  // }
 
-  export async function listAllFeedback(limit = 50, offset = 0) {
-    return authorizedFetch(
-      `${API_BASE_URL}/admin/feedback/list?limit=${limit}&offset=${offset}`
-    );
-  }
+  // export async function listAllFeedback(limit = 50, offset = 0) {
+  //   return authorizedFetch(
+  //     `${API_BASE_URL}/admin/feedback/list?limit=${limit}&offset=${offset}`
+  //   );
+  // }
 
   /* -------------------------------------------------
     KNOWLEDGE BASE (KB)
@@ -303,8 +311,16 @@ export async function getAllUsers() {
     return authorizedFetch(`${KB_BASE_URL}/`);
   }
 
-  export async function getDownloadUrl(blobName) {
-    const url = `${KB_BASE_URL}/download-url?blob_name=${encodeURIComponent(blobName)}`;
+  // export async function getDownloadUrl(blobName) {
+  //   const url = `${KB_BASE_URL}/download-url?blob_name=${encodeURIComponent(blobName)}`;
+  //   return authorizedFetch(url);
+  // }
+
+  export async function getDownloadUrl(blobName, projectName = null) {
+    let url = `${KB_BASE_URL}/download-url?blob_name=${encodeURIComponent(blobName)}`;
+    if (projectName) {
+      url += `&project=${encodeURIComponent(projectName)}`;
+    }
     return authorizedFetch(url);
   }
 
@@ -319,6 +335,23 @@ export async function getAllUsers() {
     return authorizedFetch(`${KB_BASE_URL}/delete`, {
       method: "DELETE",
       body: JSON.stringify(payload),
+    });
+  }
+
+  export async function createProject(projectName) {
+    return authorizedFetch(`${KB_BASE_URL}/create-project`, {
+      method: 'POST',
+      body: JSON.stringify({ project_name: projectName }),
+    });
+  }
+
+  export async function fetchContainers() {
+    return authorizedFetch(`${KB_BASE_URL}/containers`);
+  }
+
+  export async function triggerKbIndexer() {
+    return authorizedFetch(`${KB_BASE_URL || 'http://localhost:8000'}/search/run-indexer`, {
+      method: "POST",
     });
   }
 
@@ -355,12 +388,12 @@ export async function getAllUsers() {
     });
   }
 
-  export async function triggerKbIndexer() {
-    // Assuming indexer endpoint is on same backend or separate
-    return authorizedFetch(`${process.env.REACT_APP_AZURE_KB_API || 'http://localhost:8000'}/search/run-indexer`, {
-      method: "POST",
-    });
-  }
+  // export async function triggerKbIndexer() {
+  //   // Assuming indexer endpoint is on same backend or separate
+  //   return authorizedFetch(`${process.env.REACT_APP_AZURE_KB_API || 'http://localhost:8000'}/search/run-indexer`, {
+  //     method: "POST",
+  //   });
+  // }
 
   /* -------------------------------------------------
     FILE UPLOADS
