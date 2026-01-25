@@ -151,7 +151,7 @@ const ChatMessage = ({ message, sender, timestamp }) => {
 
   // ✅ SAFETY CHECK: Ensure message is always a string.
   // This prevents ReactMarkdown from crashing if message is null/undefined/object
-  const safeMessage = typeof message === 'string' ? message : "";
+  let safeMessage = typeof message === 'string' ? message : "";
 
   if (!isUser) {
       // Remove backend tags if they leaked through
