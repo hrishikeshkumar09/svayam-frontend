@@ -201,7 +201,12 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         // Fix 3: Remove Markdown artifacts
         text = text.replace(/```json[\s\S]*?```/gi, "");
         text = text.replace(/```json/gi, ""); 
-        text = text.replace(/```/g, ""); 
+        text = text.replace(/```/g, "");
+        
+        // --- ✅ FIX 4: Deduplicate Repeated Sentences ---
+        // This catches "Sentence.Sentence." or "Sentence. Sentence."
+        // It looks for a sequence of characters ending in a dot, followed immediately by itself.
+        text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
     }
 
     return text.trim();
