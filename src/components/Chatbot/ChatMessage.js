@@ -146,27 +146,69 @@ import PersonIcon from '@mui/icons-material/Person';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import ReactMarkdown from "react-markdown";
 
-const ChatMessage = ({ message, sender, timestamp }) => {
-  const isUser = sender === "user";
-
-  // ✅ SAFETY CHECK: Ensure message is always a string.
-  // This prevents ReactMarkdown from crashing if message is null/undefined/object
-  let safeMessage = typeof message === 'string' ? message : "";
-
-  if (!isUser) {
-      // Remove backend tags if they leaked through
-      safeMessage = safeMessage.replace(/^(GREETING|QUERY|QUERY_PROCESSING)\s*/i, "");
-      // Remove JSON artifacts
-      safeMessage = safeMessage.replace(/\{.*"answer_status".*\}/gs, "");
-  }
-
-  const formatTime = (t) => {
-    if (!t) return "";
+const formatTime = (t) => {
+  if (!t) return "";
+  try {
     return new Date(t).toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
     });
+  } catch (e) {
+    // If t is already formatted (e.g., "09:11 AM"), new Date() might fail.
+    // In that case, just return t as is.
+    return t;
+  }
+};
+
+const ChatMessage = ({ message, sender, timestamp }) => {
+  const isUser = sender === "user";
+
+  // // ✅ SAFETY CHECK: Ensure message is always a string.
+  // // This prevents ReactMarkdown from crashing if message is null/undefined/object
+  // let safeMessage = typeof message === 'string' ? message : "";
+
+  // if (!isUser) {
+  //     // Remove backend tags if they leaked through
+  //     safeMessage = safeMessage.replace(/^(GREETING|QUERY|QUERY_PROCESSING)\s*/i, "");
+  //     // Remove JSON artifacts
+  //     safeMessage = safeMessage.replace(/\{.*"answer_status".*\}/gs, "");
+  // }
+
+  // const formatTime = (t) => {
+  //   if (!t) return "";
+  //   return new Date(t).toLocaleTimeString("en-US", {
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //   });
+  // };
+
+  // --- SAFE CLEANING LOGIC START ---
+  const getDisplayMessage = () => {
+    // 1. Safety Check: If message is null/undefined, return empty string
+    if (!message) return "";
+
+    // 2. Ensure it's a string
+    let text = typeof message === 'string' ? message : String(message);
+
+    // 3. Clean ONLY if it's from the bot
+    if (!isUser) {
+        // Fix 1: Catch "_PROCESSING", "PROCESSING", "QUERY", or "GREETING"
+        text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
+
+        // Fix 2: Remove the JSON object content first
+        text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
+        
+        // Fix 3: Remove Markdown artifacts
+        text = text.replace(/```json[\s\S]*?```/gi, "");
+        text = text.replace(/```json/gi, ""); 
+        text = text.replace(/```/g, ""); 
+    }
+
+    return text.trim();
   };
+
+  const safeMessage = getDisplayMessage();
+  // --- SAFE CLEANING LOGIC END ---
 
   return (
     <Box
