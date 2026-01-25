@@ -1601,6 +1601,85 @@ const Chatbot = ({
   //   loadConversationMessages(currentConversation.conversation_uuid);
   // }, [currentConversation?.conversation_uuid]);
 
+  // useEffect(() => {
+  //   // 1. Reset if no conversation
+  //   if (!currentConversation) {
+  //     setMessages([]);
+  //     setLoadingMessages(false);
+  //     return;
+  //   }
+
+  //   // 2. SAFETY LOCK: If we already have messages for THIS conversation, stop here.
+  //   // This prevents the "wipe" when App.js updates the 'isNew' flag or other metadata.
+  //   if (messages.length > 0 && currentConversation.conversation_uuid === messages[0]?.conversation_uuid) {
+  //       setLoadingMessages(false);
+  //       return;
+  //   }
+
+  //   // 2. Handle New/Draft Chat
+  //   if (currentConversation.isNew) {
+
+  //     // ✅ FIX: If there is a pending message from Home, DO NOT clear the screen.
+  //     // We let 'handleSend' initialize the chat instead.
+  //     if (window.firstMessageFromHome) {
+  //        setLoadingMessages(false);
+  //        return; 
+  //     }
+
+  //     setMessages([]);
+  //     setLoadingMessages(false);
+  //     return;
+  //   }
+
+  //   // 3. CACHE HIT: Use data from Parent immediately
+  //   if (currentConversation.messagesLoaded && currentConversation.messages) {
+  //     setMessages(currentConversation.messages);
+  //     setLoadingMessages(false);
+  //     return;
+  //   }
+
+  //   // 4. CACHE MISS: Fetch from API (With Race Condition Fix)
+  //   let isMounted = true; // <--- FLAG TO TRACK MOUNT STATUS
+    
+  //   const fetchMessages = async () => {
+  //     setLoadingMessages(true);
+  //     try {
+  //       const loadedMessages = await getMessages(currentConversation.conversation_uuid);
+
+  //       // CHECK FLAG BEFORE UPDATING STATE
+  //       if (isMounted) { 
+  //           const formatted = loadedMessages.map((msg) => ({
+  //             sender: msg.role,
+  //             text: msg.content,
+  //             timestamp: msg.timestamp || new Date().toISOString(),
+  //           }));
+
+  //           setMessages(formatted);
+
+  //           // Update parent cache
+  //           if (onSaveMessages) {
+  //             onSaveMessages(currentConversation.conversation_uuid, formatted);
+  //           }
+  //       }
+  //     } catch (err) {
+  //       if (isMounted) {
+  //           console.error("Failed to load messages:", err);
+  //           setMessages([]);
+  //       }
+  //     } finally {
+  //       if (isMounted) setLoadingMessages(false);
+  //     }
+  //   };
+
+  //   fetchMessages();
+
+  //   // CLEANUP FUNCTION
+  //   return () => {
+  //     isMounted = false; // <--- CANCEL UPDATE IF USER SWITCHES CHATS
+  //   };
+
+  // }, [currentConversation?.conversation_uuid, currentConversation?.messagesLoaded]);
+
   useEffect(() => {
     // 1. Reset if no conversation
     if (!currentConversation) {
@@ -1609,23 +1688,8 @@ const Chatbot = ({
       return;
     }
 
-    // 2. SAFETY LOCK: If we already have messages for THIS conversation, stop here.
-    // This prevents the "wipe" when App.js updates the 'isNew' flag or other metadata.
-    if (messages.length > 0 && currentConversation.conversation_uuid === messages[0]?.conversation_uuid) {
-        setLoadingMessages(false);
-        return;
-    }
-
     // 2. Handle New/Draft Chat
     if (currentConversation.isNew) {
-
-      // ✅ FIX: If there is a pending message from Home, DO NOT clear the screen.
-      // We let 'handleSend' initialize the chat instead.
-      if (window.firstMessageFromHome) {
-         setLoadingMessages(false);
-         return; 
-      }
-
       setMessages([]);
       setLoadingMessages(false);
       return;
@@ -1678,7 +1742,7 @@ const Chatbot = ({
       isMounted = false; // <--- CANCEL UPDATE IF USER SWITCHES CHATS
     };
 
-  }, [currentConversation?.conversation_uuid]); // ✅ DEPENDENCY CHANGE: Only run if ID changes//[currentConversation?.conversation_uuid, currentConversation?.messagesLoaded]);
+  }, [currentConversation?.conversation_uuid, currentConversation?.messagesLoaded]);
 
  async function loadConversationMessages(conversationUuid) {
     setLoadingMessages(true);
@@ -1751,8 +1815,8 @@ async function handleSend(passedText) {
       sender: "user",
       text: displayText,
       timestamp: new Date().toISOString(),
-      tempId,
-      conversation_uuid: convId // ✅ ADD THIS: Locks the message to this chat
+      tempId
+      //conversation_uuid: convId // ✅ ADD THIS: Locks the message to this chat
     };
 
     setMessages((prev) => [...prev, userMessage]);
