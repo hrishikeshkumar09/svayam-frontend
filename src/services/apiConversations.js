@@ -1,9 +1,9 @@
 // src/services/apiConversations.js
-import { getAuthHeader } from './apiAuth';
+import { getAuthHeader } from './authService';
 
 // Use your deployed API URL
 //const API_BASE_URL = "https://svayam-ams-api-a2g7e0cxgsacfxcy.southindia-01.azurewebsites.net";
-const API_BASE_URL = "http://127.0.0.1:8000"; 
+const API_BASE_URL = "https://svayam-argkayfnckeccqd6.southindia-01.azurewebsites.net"; 
 
 const handleResponse = async (response) => {
   const data = await response.json();
