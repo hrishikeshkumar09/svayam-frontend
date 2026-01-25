@@ -476,7 +476,7 @@ const handleHomeScreenSend = async (text) => {
       user: loggedInUser?.userDetails,
       messages: [],
       messagesLoaded: false,
-      isNew: false,
+      isNew: true, //loader fix
       project: currentProject
     };
 
@@ -550,7 +550,7 @@ const saveMessagesToConversation = useCallback((conversationUuid, messages) => {
   setConversations(prev => {
     const updated = prev.map(conv => 
       conv.conversation_uuid === conversationUuid
-        ? { ...conv, messages, messagesLoaded: true }
+        ? { ...conv, messages, messagesLoaded: true, isNew: false } //Updated for loader
         : conv
     );
     
