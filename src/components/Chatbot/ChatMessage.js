@@ -262,7 +262,7 @@ const ChatMessage = ({ message, sender, timestamp }) => {
       )}
 
       {/* Message Bubble */}
-      <Box sx={{ maxWidth: "70%", display: "flex", flexDirection: "column" }}>
+      <Box sx={{ maxWidth: "100%", display: "flex", flexDirection: "column" }}>
         <Paper
           elevation={1}
           sx={{
@@ -288,7 +288,11 @@ const ChatMessage = ({ message, sender, timestamp }) => {
             //     : "0 2px 8px rgba(0,0,0,0.12)",
             // },
             p: 2,
-            maxWidth: "75%",
+            // ✅ FIX 2: "fit-content" stops it from squishing short text
+            width: "fit-content", 
+            // ✅ FIX 3: Allow it to grow wider (85% of screen)
+            maxWidth: "85%",
+            //maxWidth: "75%",
             borderRadius: 3,
             // ✅ FIX 2: Solid Colors (Not Transparent)
             // User = Indigo, AI = Pure White
@@ -299,6 +303,7 @@ const ChatMessage = ({ message, sender, timestamp }) => {
             // ✅ FIX 3: Add border to separate white card from white background
             border: isUser ? "none" : "1px solid #e2e8f0",
             boxShadow: isUser ? "none" : "0 2px 4px rgba(0,0,0,0.05)",
+            wordBreak: "break-word",
           }}
         >
           {safeMessage ? (
