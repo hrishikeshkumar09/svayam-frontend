@@ -1609,6 +1609,13 @@ const Chatbot = ({
       return;
     }
 
+    // 2. SAFETY LOCK: If we already have messages for THIS conversation, stop here.
+    // This prevents the "wipe" when App.js updates the 'isNew' flag or other metadata.
+    if (messages.length > 0 && currentConversation.conversation_uuid === messages[0]?.conversation_uuid) {
+        setLoadingMessages(false);
+        return;
+    }
+
     // 2. Handle New/Draft Chat
     if (currentConversation.isNew) {
 
@@ -1671,7 +1678,7 @@ const Chatbot = ({
       isMounted = false; // <--- CANCEL UPDATE IF USER SWITCHES CHATS
     };
 
-  }, [currentConversation]);//[currentConversation?.conversation_uuid, currentConversation?.messagesLoaded]);
+  }, [currentConversation?.conversation_uuid]); // ✅ DEPENDENCY CHANGE: Only run if ID changes//[currentConversation?.conversation_uuid, currentConversation?.messagesLoaded]);
 
  async function loadConversationMessages(conversationUuid) {
     setLoadingMessages(true);
@@ -1745,6 +1752,7 @@ async function handleSend(passedText) {
       text: displayText,
       timestamp: new Date().toISOString(),
       tempId,
+      conversation_uuid: convId // ✅ ADD THIS: Locks the message to this chat
     };
 
     setMessages((prev) => [...prev, userMessage]);
