@@ -262,6 +262,17 @@ const ChatMessage = ({ message, sender, timestamp }) => {
       )}
 
       {/* Message Bubble */}
+      {/* Message Bubble Wrapper */}
+      <Box 
+        sx={{ 
+          display: "flex", 
+          flexDirection: "column",
+          // ✅ FIX 1: Constraint width here, on the wrapper
+          maxWidth: "80%", 
+          // Align items to match the side (user=right, bot=left)
+          alignItems: isUser ? "flex-end" : "flex-start" 
+        }}
+      ></Box>
       <Box sx={{ maxWidth: "100%", display: "flex", flexDirection: "column" }}>
         <Paper
           elevation={1}
@@ -289,7 +300,7 @@ const ChatMessage = ({ message, sender, timestamp }) => {
             // },
             p: 2,
             // ✅ FIX 2: "fit-content" stops it from squishing short text
-            width: "fit-content", 
+            width: "auto", 
             // ✅ FIX 3: Allow it to grow wider (85% of screen)
             maxWidth: "85%",
             //maxWidth: "75%",
