@@ -747,6 +747,19 @@ export async function getAllUsers() {
     });
   }
 
+  export async function createProject(projectName) {
+     return authorizedFetch(`${KB_BASE_URL}/create-project`, {
+       method: 'POST',
+       body: JSON.stringify({ project_name: projectName }),
+     });
+  }
+
+  // ✅ ADD THIS FUNCTION HERE
+  // This uses authorizedFetch so it handles the token automatically
+  export async function fetchContainers() {
+    return authorizedFetch(`${KB_BASE_URL}/containers`);
+  }
+
   export async function triggerKbIndexer() {
     // Assuming indexer endpoint is on same backend or separate
     return authorizedFetch(`${process.env.REACT_APP_AZURE_KB_API || 'http://localhost:8000'}/search/run-indexer`, {
