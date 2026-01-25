@@ -1611,6 +1611,14 @@ const Chatbot = ({
 
     // 2. Handle New/Draft Chat
     if (currentConversation.isNew) {
+
+      // ✅ FIX: If there is a pending message from Home, DO NOT clear the screen.
+      // We let 'handleSend' initialize the chat instead.
+      if (window.firstMessageFromHome) {
+         setLoadingMessages(false);
+         return; 
+      }
+
       setMessages([]);
       setLoadingMessages(false);
       return;
