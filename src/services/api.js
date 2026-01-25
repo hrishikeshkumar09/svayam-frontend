@@ -1,7 +1,7 @@
 //src/services/api.js
 
   const API_BASE_URL = 'https://svayam-argkayfnckeccqd6.southindia-01.azurewebsites.net'
-  const KB_BASE_URL = `${process.env.REACT_APP_AZURE_KB_API || 'https://svayam-argkayfnckeccqd6.southindia-01.azurewebsites.net'}/api/kb`;
+  const KB_BASE_URL = 'https://svayam-argkayfnckeccqd6.southindia-01.azurewebsites.net/api/kb'
   
   /**
    * Gets the current logged-in user from local storage
