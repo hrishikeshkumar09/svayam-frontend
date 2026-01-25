@@ -153,6 +153,13 @@ const ChatMessage = ({ message, sender, timestamp }) => {
   // This prevents ReactMarkdown from crashing if message is null/undefined/object
   const safeMessage = typeof message === 'string' ? message : "";
 
+  if (!isUser) {
+      // Remove backend tags if they leaked through
+      safeMessage = safeMessage.replace(/^(GREETING|QUERY|QUERY_PROCESSING)\s*/i, "");
+      // Remove JSON artifacts
+      safeMessage = safeMessage.replace(/\{.*"answer_status".*\}/gs, "");
+  }
+
   const formatTime = (t) => {
     if (!t) return "";
     return new Date(t).toLocaleTimeString("en-US", {
