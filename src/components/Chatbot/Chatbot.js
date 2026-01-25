@@ -1146,6 +1146,7 @@ import {
 } from "../../services/api";
 import ChatMessage from "./ChatMessage";
 import { deleteConversation } from "../../services/api";
+import brainBg from '../../images/17460917.png';
 
 import {
   Box,
@@ -1990,7 +1991,90 @@ const handleHomeScreenEnter = () => {
   // Show Home Screen if:
   // 1. No conversation selected
   // 2. OR Selected conversation is "New" (Draft) AND has no messages yet
-  const showHomeScreen = !currentConversation
+  //const showHomeScreen = !currentConversation
+
+  // if (showHomeScreen) {
+  //   return (
+  //     <Box
+  //       sx={{
+  //         flexGrow: 1,
+  //         display: "flex",
+  //         flexDirection: "column",
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //         height: "100%",
+  //         bgcolor: "#f3f4f6", // updated color
+  //         px: 3,
+  //         pt: 2,
+  //       }}
+  //     >
+  //       <Typography
+  //         variant="h5"
+  //         sx={{
+  //           fontWeight: 700,
+  //           color: "#1e293b",
+  //           textAlign: "center",
+  //           mb: 1,
+  //           letterSpacing: "-0.3px",
+  //           fontSize: "1.55rem",
+  //         }}
+  //       >
+  //         Hi! Ready to get things done?
+  //       </Typography>
+
+  //       <Typography
+  //         sx={{
+  //           color: "#64748b", // updated color
+  //           fontSize: "0.95rem",
+  //           textAlign: "center",
+  //           maxWidth: 520,
+  //           lineHeight: 1.5,
+  //           mb: 3.5,
+  //         }}
+  //       >
+  //         Select a project and start chatting to get assistance.
+  //       </Typography>
+
+  //       <Box sx={{ width: "100%", maxWidth: "680px" }}>
+  //         <TextField
+  //           fullWidth
+  //           placeholder="Ask anything..."
+  //           value={homeInput}
+  //           onChange={(e) => setHomeInput(e.target.value)}
+  //           onKeyDown={(e) => {
+  //             if (e.key === "Enter" && !e.shiftKey) {
+  //               e.preventDefault();
+  //               handleHomeScreenEnter();
+  //             }
+  //           }}
+  //           InputProps={{
+  //             startAdornment: (
+  //               <InputAdornment position="start">
+  //                 <SearchIcon sx={{ color: "#94a3b8" }} />
+  //               </InputAdornment>
+  //             ),
+  //             sx: {
+  //               borderRadius: "14px",
+  //               background: "#ffffff",
+  //               fontSize: "0.95rem",
+  //               boxShadow: "0 3px 10px rgba(0,0,0,0.05)", // updated shadow
+  //               "& fieldset": { borderColor: "#e2e8f0" },
+  //               "&:hover fieldset": { borderColor: "#cbd5e1" },
+  //             },
+  //           }}
+  //         />
+  //       </Box>
+  //     </Box>
+  //   );
+  // }
+
+  // ==========================================
+  // HOME SCREEN (BRANDING ONLY - NO SEARCH)
+  // ==========================================
+
+  
+
+  const showHomeScreen = !currentConversation;
 
   if (showHomeScreen) {
     return (
@@ -2002,66 +2086,70 @@ const handleHomeScreenEnter = () => {
           alignItems: "center",
           justifyContent: "center",
           height: "100%",
-          bgcolor: "#f3f4f6", // updated color
-          px: 3,
-          pt: 2,
+          // Brain Background Image
+          backgroundImage: `url(${brainBg})`, // Tech/Brain Network placeholder
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          position: "relative",
         }}
       >
-        <Typography
-          variant="h5"
+        {/* Dark Overlay to ensure text readability */}
+        <Box
           sx={{
-            fontWeight: 700,
-            color: "#1e293b",
-            textAlign: "center",
-            mb: 1,
-            letterSpacing: "-0.3px",
-            fontSize: "1.55rem",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.6)", // Darkens the background
+            zIndex: 1,
           }}
-        >
-          Hi! Ready to get things done?
-        </Typography>
+        />
 
-        <Typography
-          sx={{
-            color: "#64748b", // updated color
-            fontSize: "0.95rem",
-            textAlign: "center",
-            maxWidth: 520,
-            lineHeight: 1.5,
-            mb: 3.5,
-          }}
-        >
-          Select a project and start chatting to get assistance.
-        </Typography>
+        {/* Branding Text */}
+        <Box sx={{ zIndex: 2, textAlign: "center" }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: 800,
+              color: "#ffffff",
+              letterSpacing: "4px",
+              textTransform: "uppercase",
+              fontSize: { xs: "2.5rem", md: "4rem" },
+              textShadow: "0px 4px 20px rgba(0,0,0,0.5)",
+              mb: 2,
+            }}
+          >
+            SVAYAM AMS
+          </Typography>
 
-        <Box sx={{ width: "100%", maxWidth: "680px" }}>
-          <TextField
-            fullWidth
-            placeholder="Ask anything..."
-            value={homeInput}
-            onChange={(e) => setHomeInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleHomeScreenEnter();
-              }
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#94a3b8" }} />
-                </InputAdornment>
-              ),
-              sx: {
-                borderRadius: "14px",
-                background: "#ffffff",
-                fontSize: "0.95rem",
-                boxShadow: "0 3px 10px rgba(0,0,0,0.05)", // updated shadow
-                "& fieldset": { borderColor: "#e2e8f0" },
-                "&:hover fieldset": { borderColor: "#cbd5e1" },
-              },
-            }}
-          />
+          <Typography
+             variant="h6"
+             sx={{
+               color: "rgba(255,255,255,0.8)",
+               fontWeight: 400,
+               letterSpacing: "1px",
+               maxWidth: "600px",
+               mx: "auto",
+             }}
+          >
+            AI-Powered Enterprise Assistance
+          </Typography>
+          
+          {/* Optional: Visual Cue to use sidebar */}
+          <Typography
+             variant="caption"
+             sx={{
+               display: "block",
+               mt: 6,
+               color: "rgba(255,255,255,0.5)",
+               textTransform: "uppercase",
+               letterSpacing: "1.5px",
+             }}
+          >
+            ← Click "New Chat" to begin
+          </Typography>
         </Box>
       </Box>
     );
