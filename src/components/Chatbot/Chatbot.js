@@ -2173,7 +2173,7 @@ const handleHomeScreenEnter = () => {
         {/* LOGO IMAGE */}
         <Box
           component="img"
-          src={brainLogo} // Or put your URL string here
+          src={brainBg} // Or put your URL string here
           alt="Svayam Logo"
           sx={{
             width: "300px", // ✅ Controls the size of the logo
@@ -2260,7 +2260,7 @@ const handleHomeScreenEnter = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundImage: `url(${brainLogo})`, // Use the same logo
+          backgroundImage: `url(${brainBg})`, // Use the same logo
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
           backgroundSize: "400px", // Size of the watermark
