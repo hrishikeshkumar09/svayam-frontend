@@ -309,19 +309,41 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         // }
 
         // Fix 1: Catch "_PROCESSING", "PROCESSING", "QUERY", or "GREETING"
-        text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
+        // text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
 
-        // Fix 2: Remove the JSON object content first
-        text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
+        // // Fix 2: Remove the JSON object content first
+        // text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
         
-        // Fix 3: Remove Markdown artifacts
-        text = text.replace(/```json[\s\S]*?```/gi, "");
-        text = text.replace(/```json/gi, ""); 
-        text = text.replace(/```/g, "");
+        // // Fix 3: Remove Markdown artifacts
+        // text = text.replace(/```json[\s\S]*?```/gi, "");
+        // text = text.replace(/```json/gi, ""); 
+        // text = text.replace(/```/g, "");
         
-        // --- ✅ FIX 4: Deduplicate Repeated Sentences ---
-        // This catches "Sentence.Sentence." or "Sentence. Sentence."
-        // It looks for a sequence of characters ending in a dot, followed immediately by itself.
+        // // --- ✅ FIX 4: Deduplicate Repeated Sentences ---
+        // // This catches "Sentence.Sentence." or "Sentence. Sentence."
+        // // It looks for a sequence of characters ending in a dot, followed immediately by itself.
+        // text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
+
+        // --- SMART FOUND SPLIT ---
+        // We only split if "FOUND" is followed immediately by a Capital Letter OR a Number.
+        // This catches "FOUNDSAM" or "FOUND2" while ignoring "FOUND a file".
+        const artifactMatch = text.match(/FOUND([A-Z0-9])/);
+
+        if (artifactMatch) {
+            // artifactMatch.index is the start of "FOUND".
+            // We want to keep the text starting AFTER "FOUND" (index + 5).
+            text = text.substring(artifactMatch.index + 5);
+        } else {
+            // FALLBACK: If "FOUND" artifact isn't present, run standard cleanup
+            // so partial "Processing..." messages don't look ugly.
+            text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
+            text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
+            text = text.replace(/```json[\s\S]*?```/gi, "");
+            text = text.replace(/```/g, "");
+        }
+
+        // Final cleanup
+        text = text.trim();
         text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
     }
 
