@@ -327,23 +327,44 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         // --- SMART FOUND SPLIT ---
         // We only split if "FOUND" is followed immediately by a Capital Letter OR a Number.
         // This catches "FOUNDSAM" or "FOUND2" while ignoring "FOUND a file".
+        // const artifactMatch = text.match(/FOUND([A-Z0-9])/);
+
+        // if (artifactMatch) {
+        //     // artifactMatch.index is the start of "FOUND".
+        //     // We want to keep the text starting AFTER "FOUND" (index + 5).
+        //     text = text.substring(artifactMatch.index + 5);
+        // } else {
+        //     // FALLBACK: If "FOUND" artifact isn't present, run standard cleanup
+        //     // so partial "Processing..." messages don't look ugly.
+        //     text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
+        //     text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
+        //     text = text.replace(/```json[\s\S]*?```/gi, "");
+        //     text = text.replace(/```/g, "");
+        // }
+
+        // // Final cleanup
+        // text = text.trim();
+        // text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
+
+        // --- PRIORITY: THE "FOUND" STRATEGY ---
+        // Find the FIRST occurrence of "FOUND" followed immediately by a Capital Letter or Number.
         const artifactMatch = text.match(/FOUND([A-Z0-9])/);
 
         if (artifactMatch) {
-            // artifactMatch.index is the start of "FOUND".
-            // We want to keep the text starting AFTER "FOUND" (index + 5).
-            text = text.substring(artifactMatch.index + 5);
-        } else {
-            // FALLBACK: If "FOUND" artifact isn't present, run standard cleanup
-            // so partial "Processing..." messages don't look ugly.
-            text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
-            text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
-            text = text.replace(/```json[\s\S]*?```/gi, "");
-            text = text.replace(/```/g, "");
+            // Found it! 
+            // We take everything starting AFTER "FOUND" (index + 5).
+            // We return immediately to avoid any further regex modifying the content.
+            return text.substring(artifactMatch.index + 5).trim();
         }
 
-        // Final cleanup
-        text = text.trim();
+        // --- FALLBACK CLEANUP ---
+        // (Only runs if "FOUND" was NOT present in the message)
+        text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
+        text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
+        text = text.replace(/```json[\s\S]*?```/gi, "");
+        text = text.replace(/```/g, "");
+        
+        // Basic sentence deduplication for non-FOUND messages (optional safety)
         text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
     }
 
