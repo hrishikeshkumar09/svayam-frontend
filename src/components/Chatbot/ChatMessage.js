@@ -355,6 +355,10 @@ const ChatMessage = ({ message, sender, timestamp }) => {
             // We take everything starting AFTER "FOUND" (index + 5).
             // We return immediately to avoid any further regex modifying the content.
             return text.substring(artifactMatch.index + 5).trim();
+        } else {
+            // ⚠️ FALLBACK: "FOUND" was not detected.
+            // We must manually remove the JSON object if it exists.
+            text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
         }
 
         // --- FALLBACK CLEANUP ---
@@ -371,8 +375,8 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         text = text.replace(/```json/gi, ""); 
         text = text.replace(/```/g, "");
 
-        // 3. Remove stray closing braces from JSON
-        text = text.replace(/\s*\}\s*$/, "");
+        // // 3. Remove stray closing braces from JSON
+        // text = text.replace(/\s*\}\s*$/, "");
 
         // --- STEP C: FORMATTING ---
         text = text.trim();
