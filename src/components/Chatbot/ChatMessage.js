@@ -273,7 +273,7 @@ const ChatMessage = ({ message, sender, timestamp }) => {
           alignItems: isUser ? "flex-end" : "flex-start" 
         }}
       ></Box>
-      <Box sx={{ maxWidth: "100%", display: "flex", flexDirection: "column" }}>
+      <Box sx={{ maxWidth: "75%", display: "flex", flexDirection: "column" }}>
         <Paper
           elevation={1}
           sx={{
@@ -302,7 +302,7 @@ const ChatMessage = ({ message, sender, timestamp }) => {
             // ✅ FIX 2: "fit-content" stops it from squishing short text
             width: "auto", 
             // ✅ FIX 3: Allow it to grow wider (85% of screen)
-            maxWidth: "85%",
+            maxWidth: "100%",
             //maxWidth: "75%",
             borderRadius: 3,
             // ✅ FIX 2: Solid Colors (Not Transparent)
