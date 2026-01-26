@@ -1911,15 +1911,15 @@ const Chatbot = ({
 //     }
 //   }
 
-  async function handleSend(passedText) {
+async function handleSend(passedText) {
     const textRaw = passedText ?? chatInput;
     const text = (textRaw || "").trim();
- 
+
     if (!text && attachments.length === 0) return;
     if (chatLoading) return;
- 
+
     let convId = currentConversation?.conversation_uuid;
- 
+
     if (!convId || currentConversation?.isNew) {
       try {
         if (!selectedProject) {
@@ -1928,7 +1928,7 @@ const Chatbot = ({
         }
         const newConvData = await startConversation(selectedProject);
         convId = newConvData.conversation_uuid;
- 
+
         if (onNewChatCreated) {
           onNewChatCreated(newConvData);
         }
@@ -1938,25 +1938,26 @@ const Chatbot = ({
         return;
       }
     }
- 
+
     let displayText = text;
     if (attachments.length > 0) {
       const filesLabel = attachments.map((a) => `📎 ${a.name}`).join("\n");
       displayText = text ? `${text}\n\n${filesLabel}` : filesLabel;
     }
- 
+
     const tempId = Date.now();
     const userMessage = {
       sender: "user",
       text: displayText,
       timestamp: new Date().toISOString(),
-      tempId,
+      tempId
+      //conversation_uuid: convId // ✅ ADD THIS: Locks the message to this chat
     };
- 
+
     setMessages((prev) => [...prev, userMessage]);
- 
+
     const filesToSend = attachments.map((a) => a.file);
- 
+
     setChatInput("");
     attachments.forEach((a) => {
       if (a.previewUrl) {
@@ -1964,60 +1965,40 @@ const Chatbot = ({
       }
     });
     setAttachments([]);
- 
+
     setChatLoading(true);
     setIsTyping(false);
- 
+
     try {
       let response;
-      setMessages(prev => [
-  ...prev,
-  {
-    sender: "assistant",
-    text: "",                 // placeholder
-    timestamp: new Date().toISOString(),
-    _local: true              // optional flag
-  }
-]);
- 
+      
       if (filesToSend.length > 0) {
         response = await sendMessageWithFiles(convId, text, filesToSend);
       } else {
         response = await sendMessage(convId, text);
       }
- 
-      // setMessages((prev) => {
-      //   const updatedMessages = [...prev, assistantMessage];
- 
-      //   // ✅ SAVE updated messages to conversation
-      //   if (onSaveMessages) {
-      //     onSaveMessages(convId, updatedMessages);
-      //   }
- 
-      //   return updatedMessages;
-      // });
- 
+
+      const assistantMessage = {
+        sender: response.role || "assistant",
+        text: response.content,
+        timestamp: response.timestamp || new Date().toISOString(),
+      };
+
       setMessages((prev) => {
-  const updated = [...prev];
- 
-  // replace the last assistant placeholder instead of appending
-  updated[updated.length - 1] = {
-    sender: "assistant",
-    text: response.content,
-    timestamp: response.timestamp || new Date().toISOString(),
-  };
- 
-  if (onSaveMessages) {
-    onSaveMessages(convId, updated);
-  }
- 
-  return updated;
-});
- 
- 
+        const updatedMessages = [...prev, assistantMessage];
+        
+        // ✅ SAVE updated messages to conversation
+        if (onSaveMessages) {
+          onSaveMessages(convId, updatedMessages);
+        }
+        
+        return updatedMessages;
+      });
+
       if (onConversationUpdate) {
         onConversationUpdate(convId);
       }
+      
     } catch (err) {
       console.error("Chat error:", err);
       setMessages((prev) => prev.filter((m) => m.tempId !== tempId));
@@ -2026,7 +2007,7 @@ const Chatbot = ({
     } finally {
       setChatLoading(false);
     }
-}
+  }
 
 
   // Handle first message from home screen
