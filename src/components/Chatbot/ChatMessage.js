@@ -212,53 +212,105 @@ const ChatMessage = ({ message, sender, timestamp }) => {
     // 3. Clean ONLY if it's from the bot
     if (!isUser) {
 
-        let references = "";
+        // let references = "";
         
-        // Search for "References:" or "Sources:" allowing for emojis (📚, 📁), bolding (**), or newlines before it.
-        // We use a broader match to catch the specific icon used in your screenshots.
-        const refRegex = /(\n|\r\n)?\s*.{0,5}\s*(\*\*|__)?(References|Sources)(\*\*|__)?\s*:\s*[\s\S]*$/i;
-        const refMatch = text.match(refRegex);
+        // // Search for "References:" or "Sources:" allowing for emojis (📚, 📁), bolding (**), or newlines before it.
+        // // We use a broader match to catch the specific icon used in your screenshots.
+        // const refRegex = /(\n|\r\n)?\s*.{0,5}\s*(\*\*|__)?(References|Sources)(\*\*|__)?\s*:\s*[\s\S]*$/i;
+        // const refMatch = text.match(refRegex);
         
-        if (refMatch) {
-            references = refMatch[0]; // Save the whole references block
-            text = text.substring(0, refMatch.index).trim(); // Remove it from main text for now
-        }
+        // if (refMatch) {
+        //     references = refMatch[0]; // Save the whole references block
+        //     text = text.substring(0, refMatch.index).trim(); // Remove it from main text for now
+        // }
 
-        // --- 2. EXPLICIT LOOP CUT (FOUND) ---
-        // If "FOUND" followed by a Capital Letter exists, cut it immediately.
-        const foundMatch = text.match(/(\.|!|\?)?\s*FOUND\s*([A-Z])/);
-        if (foundMatch) {
-            text = text.substring(0, foundMatch.index + (foundMatch[1] ? 1 : 0)).trim(); 
-        }
+        // // --- 2. EXPLICIT LOOP CUT (FOUND) ---
+        // // If "FOUND" followed by a Capital Letter exists, cut it immediately.
+        // const foundMatch = text.match(/(\.|!|\?)?\s*FOUND\s*([A-Z])/);
+        // if (foundMatch) {
+        //     text = text.substring(0, foundMatch.index + (foundMatch[1] ? 1 : 0)).trim(); 
+        // }
 
-        // --- 3. ECHO CUT (Question? Answer) ---
-        // If the text starts with "Question?Answer", remove the question.
-        // We look for a '?' followed immediately by a Capital Letter within the first 300 chars.
-        const echoMatch = text.match(/^[\s\S]{0,300}?\?(\s*[A-Z])/);
-        if (echoMatch) {
-             // Keep the letter (Group 1), discard the '?' and text before it.
-             const keepIndex = echoMatch.index + echoMatch[0].length - echoMatch[1].length;
-             text = text.substring(keepIndex).trim();
-        }
+        // // --- 3. ECHO CUT (Question? Answer) ---
+        // // If the text starts with "Question?Answer", remove the question.
+        // // We look for a '?' followed immediately by a Capital Letter within the first 300 chars.
+        // const echoMatch = text.match(/^[\s\S]{0,300}?\?(\s*[A-Z])/);
+        // if (echoMatch) {
+        //      // Keep the letter (Group 1), discard the '?' and text before it.
+        //      const keepIndex = echoMatch.index + echoMatch[0].length - echoMatch[1].length;
+        //      text = text.substring(keepIndex).trim();
+        // }
 
-        // --- 4. IMPLICIT LOOP CUT (Repetition Check) ---
-        // This fixes the "First sentence repeating at the last" issue.
-        // Logic: Take the first 60 chars (approx one sentence). If they appear again later, cut there.
-        if (text.length > 150) { // Only run on long messages
-             const startFingerprint = text.substring(0, 60);
-             // Search for this fingerprint starting from index 60
-             const repeatIndex = text.indexOf(startFingerprint, 60);
+        // // --- 4. IMPLICIT LOOP CUT (Repetition Check) ---
+        // // This fixes the "First sentence repeating at the last" issue.
+        // // Logic: Take the first 60 chars (approx one sentence). If they appear again later, cut there.
+        // if (text.length > 150) { // Only run on long messages
+        //      const startFingerprint = text.substring(0, 60);
+        //      // Search for this fingerprint starting from index 60
+        //      const repeatIndex = text.indexOf(startFingerprint, 60);
              
-             if (repeatIndex !== -1) {
-                 // We found the start text repeated later! Cut everything after.
-                 text = text.substring(0, repeatIndex).trim();
-             }
-        }
+        //      if (repeatIndex !== -1) {
+        //          // We found the start text repeated later! Cut everything after.
+        //          text = text.substring(0, repeatIndex).trim();
+        //      }
+        // }
 
+
+        // // Fix 1: Catch "_PROCESSING", "PROCESSING", "QUERY", or "GREETING"
+        // text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
+        // text = text.replace(/\.FOUND/g, ". ");
+        // // Fix 2: Remove the JSON object content first
+        // text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
+        
+        // // Fix 3: Remove Markdown artifacts
+        // text = text.replace(/```json[\s\S]*?```/gi, "");
+        // text = text.replace(/```json/gi, ""); 
+        // text = text.replace(/```/g, "");
+        // text = text.replace(/\.FOUND/g, ". ");
+
+        // // --- ✅ FIX 4: Deduplicate Repeated Sentences ---
+        // // This catches "Sentence.Sentence." or "Sentence. Sentence."
+        // // It looks for a sequence of characters ending in a dot, followed immediately by itself.
+        // //text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
+        
+        // // if (foundMatch) {
+        // //     const splitIndex = foundMatch.index;
+        // //     // Get the text AFTER "FOUND" to see if it's a duplicate
+        // //     const afterFound = text.substring(splitIndex + foundMatch[0].length - 1); // -1 to keep the start letter
+            
+        // //     // If the message STARTS with the same text as what's AFTER "FOUND", it's a loop.
+        // //     // We check the first 20 chars to be safe.
+        // //     if (afterFound.length > 10 && text.startsWith(afterFound.substring(0, 20))) {
+        // //         // CUT IT OFF: Keep only the text before "FOUND"
+        // //         text = text.substring(0, splitIndex + 1).trim(); 
+        // //     }
+        // // }
+
+        // // 3. Sentence Deduplication (Cleanup for other small repetitions)
+         
+        // // const sentences = text.split(/(?<=\.)\s+/g); 
+        // // const uniqueSentences = new Set();
+        // // const cleanSentences = [];
+
+        // // sentences.forEach(s => {
+        // //      const trimmed = s.trim();
+        // //      if (trimmed && !uniqueSentences.has(trimmed)) {
+        // //          uniqueSentences.add(trimmed);
+        // //          cleanSentences.push(trimmed);
+        // //      }
+        // // });
+
+        // // text = cleanSentences.join(" ");
+
+        // // --- STEP C: RESTORE REFERENCES ---
+        // if (references) {
+        //     // Append the saved references back to the clean text
+        //     text = text + "\n\n" + references.trim();
+        // }
 
         // Fix 1: Catch "_PROCESSING", "PROCESSING", "QUERY", or "GREETING"
         text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
-        text = text.replace(/\.FOUND/g, ". ");
+
         // Fix 2: Remove the JSON object content first
         text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
         
@@ -266,47 +318,11 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         text = text.replace(/```json[\s\S]*?```/gi, "");
         text = text.replace(/```json/gi, ""); 
         text = text.replace(/```/g, "");
-        text = text.replace(/\.FOUND/g, ". ");
-
+        
         // --- ✅ FIX 4: Deduplicate Repeated Sentences ---
         // This catches "Sentence.Sentence." or "Sentence. Sentence."
         // It looks for a sequence of characters ending in a dot, followed immediately by itself.
-        //text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
-        
-        // if (foundMatch) {
-        //     const splitIndex = foundMatch.index;
-        //     // Get the text AFTER "FOUND" to see if it's a duplicate
-        //     const afterFound = text.substring(splitIndex + foundMatch[0].length - 1); // -1 to keep the start letter
-            
-        //     // If the message STARTS with the same text as what's AFTER "FOUND", it's a loop.
-        //     // We check the first 20 chars to be safe.
-        //     if (afterFound.length > 10 && text.startsWith(afterFound.substring(0, 20))) {
-        //         // CUT IT OFF: Keep only the text before "FOUND"
-        //         text = text.substring(0, splitIndex + 1).trim(); 
-        //     }
-        // }
-
-        // 3. Sentence Deduplication (Cleanup for other small repetitions)
-         
-        // const sentences = text.split(/(?<=\.)\s+/g); 
-        // const uniqueSentences = new Set();
-        // const cleanSentences = [];
-
-        // sentences.forEach(s => {
-        //      const trimmed = s.trim();
-        //      if (trimmed && !uniqueSentences.has(trimmed)) {
-        //          uniqueSentences.add(trimmed);
-        //          cleanSentences.push(trimmed);
-        //      }
-        // });
-
-        // text = cleanSentences.join(" ");
-
-        // --- STEP C: RESTORE REFERENCES ---
-        if (references) {
-            // Append the saved references back to the clean text
-            text = text + "\n\n" + references.trim();
-        }
+        text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
     }
 
     return text.trim();
