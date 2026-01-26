@@ -359,13 +359,26 @@ const ChatMessage = ({ message, sender, timestamp }) => {
 
         // --- FALLBACK CLEANUP ---
         // (Only runs if "FOUND" was NOT present in the message)
+        // text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
+        // text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
+        // text = text.replace(/```json[\s\S]*?```/gi, "");
+        // text = text.replace(/```/g, "");
+        // 1. Remove Processing/Query tags
         text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
-        text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
+
+        // 2. Remove Markdown Code Block Wrappers
         text = text.replace(/```json[\s\S]*?```/gi, "");
+        text = text.replace(/```json/gi, ""); 
         text = text.replace(/```/g, "");
+
+        // 3. Remove stray closing braces from JSON
+        text = text.replace(/\s*\}\s*$/, "");
+
+        // --- STEP C: FORMATTING ---
+        text = text.trim();
         
         // Basic sentence deduplication for non-FOUND messages (optional safety)
-        text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
+        //text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
     }
 
     return text.trim();
