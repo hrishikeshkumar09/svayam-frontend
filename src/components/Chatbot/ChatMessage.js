@@ -212,9 +212,17 @@ const ChatMessage = ({ message, sender, timestamp }) => {
     // 3. Clean ONLY if it's from the bot
     if (!isUser) {
 
+        // We extract the references section first so it doesn't get deleted by the Loop Breaker.
+        let references = "";
+        // Matches "References:", "Sources:", or the emoji version at the end of string
+        const refMatch = text.match(/(\n|\r\n)?\s*([\uD83C-\uDBFF\uDC00-\uDFFF])?\s*(References|Sources):\s*[\s\S]*$/i);
+        
+        if (refMatch) {
+            references = refMatch[0]; // Save the references
+            text = text.substring(0, refMatch.index).trim(); // Remove them from main text temporarily
+        }
+
         // 0. 🔴 ECHO REMOVER: Remove "Question?Answer" pattern at the start
-        // The backend often returns: "What is SAM?SAM is..." (No space after ?)
-        // logic: Find the first '?' that is immediately followed by a Capital Letter
         const echoMatch = text.match(/^[\s\S]*?\?([A-Z])/);
         
         // Only strip if this pattern happens at the very start (first 300 chars)
