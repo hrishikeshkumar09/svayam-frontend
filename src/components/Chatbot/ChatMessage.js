@@ -212,21 +212,16 @@ const ChatMessage = ({ message, sender, timestamp }) => {
     // 3. Clean ONLY if it's from the bot
     if (!isUser) {
 
-        // We extract the references section first so it doesn't get deleted by the Loop Breaker.
         let references = "";
-        // Matches "References:", "Sources:", or the emoji version at the end of string
-        const refMatch = text.match(/(\n|\r\n|^)\s*([^\w\s])?\s*(\*\*|__)?(References|Sources)(\*\*|__)?:\s*[\s\S]*$/i);
+        
+        // Search for "References:" or "Sources:" allowing for emojis (📚, 📁), bolding (**), or newlines before it.
+        // We use a broader match to catch the specific icon used in your screenshots.
+        const refRegex = /(\n|\r\n)?\s*.{0,5}\s*(\*\*|__)?(References|Sources)(\*\*|__)?\s*:\s*[\s\S]*$/i;
+        const refMatch = text.match(refRegex);
         
         if (refMatch) {
-            references = refMatch[0]; // Save the references block
-            text = text.substring(0, refMatch.index).trim(); // Remove them from main text temporarily
-        }
-
-        // 0. 🔴 ECHO REMOVER: Remove "Question?Answer" pattern at the start
-        const echoMatch = text.match(/^.{0,150}?\?([A-Z])/);
-        if (echoMatch) {
-             const splitPoint = echoMatch.index + echoMatch[0].length - 1;
-             text = text.substring(splitPoint);
+            references = refMatch[0]; // Save the whole references block
+            text = text.substring(0, refMatch.index).trim(); // Remove it from main text for now
         }
 
         // Fix 1: Catch "_PROCESSING", "PROCESSING", "QUERY", or "GREETING"
@@ -240,6 +235,14 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         text = text.replace(/```json/gi, ""); 
         text = text.replace(/```/g, "");
         
+        // 2. ECHO REMOVER: Remove "Question?Answer" pattern at the start
+        // ✅ FIX: Reduced range to 50 chars. Only removes if the "echo" is at the very, very start.
+        const echoMatch = text.match(/^.{0,50}?\?([A-Z])/);
+        if (echoMatch) {
+             const splitPoint = echoMatch.index + echoMatch[0].length - 1;
+             text = text.substring(splitPoint);
+        }
+
         // --- ✅ FIX 4: Deduplicate Repeated Sentences ---
         // This catches "Sentence.Sentence." or "Sentence. Sentence."
         // It looks for a sequence of characters ending in a dot, followed immediately by itself.
@@ -264,19 +267,19 @@ const ChatMessage = ({ message, sender, timestamp }) => {
 
         // 3. Sentence Deduplication (Cleanup for other small repetitions)
         text = text.replace(/\.FOUND/g, ". "); 
-        const sentences = text.split(/(?<=\.)\s+/g); 
-        const uniqueSentences = new Set();
-        const cleanSentences = [];
+        // const sentences = text.split(/(?<=\.)\s+/g); 
+        // const uniqueSentences = new Set();
+        // const cleanSentences = [];
 
-        sentences.forEach(s => {
-             const trimmed = s.trim();
-             if (trimmed && !uniqueSentences.has(trimmed)) {
-                 uniqueSentences.add(trimmed);
-                 cleanSentences.push(trimmed);
-             }
-        });
+        // sentences.forEach(s => {
+        //      const trimmed = s.trim();
+        //      if (trimmed && !uniqueSentences.has(trimmed)) {
+        //          uniqueSentences.add(trimmed);
+        //          cleanSentences.push(trimmed);
+        //      }
+        // });
 
-        text = cleanSentences.join(" ");
+        // text = cleanSentences.join(" ");
 
         // --- STEP C: RESTORE REFERENCES ---
         if (references) {
