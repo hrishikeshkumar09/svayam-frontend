@@ -211,6 +211,20 @@ const ChatMessage = ({ message, sender, timestamp }) => {
 
     // 3. Clean ONLY if it's from the bot
     if (!isUser) {
+
+        // 0. 🔴 ECHO REMOVER: Remove "Question?Answer" pattern at the start
+        // The backend often returns: "What is SAM?SAM is..." (No space after ?)
+        // logic: Find the first '?' that is immediately followed by a Capital Letter
+        const echoMatch = text.match(/^[\s\S]*?\?([A-Z])/);
+        
+        // Only strip if this pattern happens at the very start (first 300 chars)
+        if (echoMatch && echoMatch.index < 300) {
+             // Keep everything AFTER the '?' (but include the matched capital letter)
+             // echoMatch[0] includes the '?' and the letter (e.g. "?S")
+             // We start substring from where the match ends, minus 1 to keep the letter
+             const splitPoint = echoMatch.index + echoMatch[0].length - 1;
+             text = text.substring(splitPoint);
+        }
         // Fix 1: Catch "_PROCESSING", "PROCESSING", "QUERY", or "GREETING"
         text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
 
