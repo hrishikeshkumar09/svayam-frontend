@@ -215,24 +215,20 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         // We extract the references section first so it doesn't get deleted by the Loop Breaker.
         let references = "";
         // Matches "References:", "Sources:", or the emoji version at the end of string
-        const refMatch = text.match(/(\n|\r\n)?\s*([\uD83C-\uDBFF\uDC00-\uDFFF])?\s*(References|Sources):\s*[\s\S]*$/i);
+        const refMatch = text.match(/(\n|\r\n|^)\s*([^\w\s])?\s*(\*\*|__)?(References|Sources)(\*\*|__)?:\s*[\s\S]*$/i);
         
         if (refMatch) {
-            references = refMatch[0]; // Save the references
+            references = refMatch[0]; // Save the references block
             text = text.substring(0, refMatch.index).trim(); // Remove them from main text temporarily
         }
 
         // 0. 🔴 ECHO REMOVER: Remove "Question?Answer" pattern at the start
-        const echoMatch = text.match(/^[\s\S]*?\?([A-Z])/);
-        
-        // Only strip if this pattern happens at the very start (first 300 chars)
-        if (echoMatch && echoMatch.index < 300) {
-             // Keep everything AFTER the '?' (but include the matched capital letter)
-             // echoMatch[0] includes the '?' and the letter (e.g. "?S")
-             // We start substring from where the match ends, minus 1 to keep the letter
+        const echoMatch = text.match(/^.{0,150}?\?([A-Z])/);
+        if (echoMatch) {
              const splitPoint = echoMatch.index + echoMatch[0].length - 1;
              text = text.substring(splitPoint);
         }
+
         // Fix 1: Catch "_PROCESSING", "PROCESSING", "QUERY", or "GREETING"
         text = text.replace(/^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i, "");
 
@@ -281,6 +277,12 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         });
 
         text = cleanSentences.join(" ");
+
+        // --- STEP C: RESTORE REFERENCES ---
+        if (references) {
+            // Append the saved references back to the clean text
+            text = text + "\n\n" + references.trim();
+        }
     }
 
     return text.trim();
