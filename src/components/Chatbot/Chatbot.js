@@ -1174,21 +1174,21 @@ import CloseIcon from "@mui/icons-material/Close";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 
 
-const removeDuplicates = (messages) => {
-  const seen = new Set();
-  return messages.filter((msg) => {
-    // Create a unique key for the message
-    // We use the first 50 chars of text + sender to identify duplicates
-    const contentKey = (msg.text || "").substring(0, 50).trim();
-    const key = `${msg.sender}-${contentKey}`;
+// const removeDuplicates = (messages) => {
+//   const seen = new Set();
+//   return messages.filter((msg) => {
+//     // Create a unique key for the message
+//     // We use the first 50 chars of text + sender to identify duplicates
+//     const contentKey = (msg.text || "").substring(0, 50).trim();
+//     const key = `${msg.sender}-${contentKey}`;
     
-    if (seen.has(key)) {
-      return false; // It's a duplicate, skip it
-    }
-    seen.add(key);
-    return true;
-  });
-};
+//     if (seen.has(key)) {
+//       return false; // It's a duplicate, skip it
+//     }
+//     seen.add(key);
+//     return true;
+//   });
+// };
 
 // ==========================================
 // INLINE FEEDBACK COMPONENT (Appears from Assistant)
@@ -1715,13 +1715,13 @@ const Chatbot = ({
 
     // 3. CACHE HIT: Use data from Parent immediately
     if (currentConversation.messagesLoaded && currentConversation.messages) {
-      // setMessages(currentConversation.messages);
-      // setLoadingMessages(false);
-      // return;
-      const uniqueMsgs = removeDuplicates(currentConversation.messages);
-      setMessages(uniqueMsgs);
+      setMessages(currentConversation.messages);
       setLoadingMessages(false);
       return;
+      // const uniqueMsgs = removeDuplicates(currentConversation.messages);
+      // setMessages(uniqueMsgs);
+      // setLoadingMessages(false);
+      // return;
     }
 
     // 4. CACHE MISS: Fetch from API (With Race Condition Fix)
@@ -1740,20 +1740,20 @@ const Chatbot = ({
               timestamp: msg.timestamp || new Date().toISOString(),
             }));
 
-            // setMessages(formatted);
+            setMessages(formatted);
 
-            // // Update parent cache
-            // if (onSaveMessages) {
-            //   onSaveMessages(currentConversation.conversation_uuid, formatted);
-            // }
-            // ✅ FIX: Run deduplication here too
-            const uniqueFormatted = removeDuplicates(formatted);
-            
-            setMessages(uniqueFormatted);
-            
+            // Update parent cache
             if (onSaveMessages) {
-              onSaveMessages(currentConversation.conversation_uuid, uniqueFormatted);
+              onSaveMessages(currentConversation.conversation_uuid, formatted);
             }
+            // // ✅ FIX: Run deduplication here too
+            // const uniqueFormatted = removeDuplicates(formatted);
+            
+            // setMessages(uniqueFormatted);
+            
+            // if (onSaveMessages) {
+            //   onSaveMessages(currentConversation.conversation_uuid, uniqueFormatted);
+            // }
         }
       } catch (err) {
         if (isMounted) {
@@ -1880,21 +1880,21 @@ async function handleSend(passedText) {
       };
 
       setMessages((prev) => {
-        // const updatedMessages = [...prev, assistantMessage];
+        const updatedMessages = [...prev, assistantMessage];
         
-        // // ✅ SAVE updated messages to conversation
-        // if (onSaveMessages) {
-        //   onSaveMessages(convId, updatedMessages);
-        // }
-        
-        // return updatedMessages;
-        // ✅ FIX: Deduplicate when appending the new AI response
-        const updatedMessages = removeDuplicates([...prev, assistantMessage]);
-        
+        // ✅ SAVE updated messages to conversation
         if (onSaveMessages) {
           onSaveMessages(convId, updatedMessages);
         }
+        
         return updatedMessages;
+        // // ✅ FIX: Deduplicate when appending the new AI response
+        // const updatedMessages = removeDuplicates([...prev, assistantMessage]);
+        
+        // if (onSaveMessages) {
+        //   onSaveMessages(convId, updatedMessages);
+        // }
+        // return updatedMessages;
       });
 
       if (onConversationUpdate) {
