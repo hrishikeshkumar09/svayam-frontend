@@ -204,6 +204,8 @@ const ChatMessage = ({ message, sender, timestamp }) => {
     // 1. Safety Check: If message is null/undefined, return empty string
     if (!message) return "";
 
+    let safeMessage = "";
+
     // 2. Ensure it's a string
     let text = typeof message === 'string' ? message : String(message);
 
@@ -223,7 +225,40 @@ const ChatMessage = ({ message, sender, timestamp }) => {
         // --- ✅ FIX 4: Deduplicate Repeated Sentences ---
         // This catches "Sentence.Sentence." or "Sentence. Sentence."
         // It looks for a sequence of characters ending in a dot, followed immediately by itself.
-        text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
+        //text = text.replace(/([^\.]+\.)\s*\1/g, "$1");
+
+        // 2. 🔴 LOOP BREAKER: Detect "Answer...FOUNDAnswer..." pattern
+        // The backend sometimes pastes the answer twice separated by "FOUND"
+        const foundMatch = text.match(/(\.|!|\?)?\s*FOUND\s*([A-Z])/);
+        
+        if (foundMatch) {
+            const splitIndex = foundMatch.index;
+            // Get the text AFTER "FOUND" to see if it's a duplicate
+            const afterFound = text.substring(splitIndex + foundMatch[0].length - 1); // -1 to keep the start letter
+            
+            // If the message STARTS with the same text as what's AFTER "FOUND", it's a loop.
+            // We check the first 20 chars to be safe.
+            if (afterFound.length > 10 && text.startsWith(afterFound.substring(0, 20))) {
+                // CUT IT OFF: Keep only the text before "FOUND"
+                text = text.substring(0, splitIndex + 1).trim(); 
+            }
+        }
+
+        // 3. Sentence Deduplication (Cleanup for other small repetitions)
+        text = text.replace(/\.FOUND/g, ". "); 
+        const sentences = text.split(/(?<=\.)\s+/g); 
+        const uniqueSentences = new Set();
+        const cleanSentences = [];
+
+        sentences.forEach(s => {
+             const trimmed = s.trim();
+             if (trimmed && !uniqueSentences.has(trimmed)) {
+                 uniqueSentences.add(trimmed);
+                 cleanSentences.push(trimmed);
+             }
+        });
+
+        text = cleanSentences.join(" ");
     }
 
     return text.trim();
