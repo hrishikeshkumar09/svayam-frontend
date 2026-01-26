@@ -1806,15 +1806,120 @@ const Chatbot = ({
   // ==========================================
   // SEND MESSAGE (WITH OPTIONAL FILES)
   // ==========================================
-async function handleSend(passedText) {
+// async function handleSend(passedText) {
+//     const textRaw = passedText ?? chatInput;
+//     const text = (textRaw || "").trim();
+
+//     if (!text && attachments.length === 0) return;
+//     if (chatLoading) return;
+
+//     let convId = currentConversation?.conversation_uuid;
+
+//     if (!convId || currentConversation?.isNew) {
+//       try {
+//         if (!selectedProject) {
+//           alert("Please select a project first.");
+//           return;
+//         }
+//         const newConvData = await startConversation(selectedProject);
+//         convId = newConvData.conversation_uuid;
+
+//         if (onNewChatCreated) {
+//           onNewChatCreated(newConvData);
+//         }
+//       } catch (err) {
+//         console.error("Failed to start new conversation:", err);
+//         alert("Could not start chat. Please check your connection.");
+//         return;
+//       }
+//     }
+
+//     let displayText = text;
+//     if (attachments.length > 0) {
+//       const filesLabel = attachments.map((a) => `📎 ${a.name}`).join("\n");
+//       displayText = text ? `${text}\n\n${filesLabel}` : filesLabel;
+//     }
+
+//     const tempId = Date.now();
+//     const userMessage = {
+//       sender: "user",
+//       text: displayText,
+//       timestamp: new Date().toISOString(),
+//       tempId
+//       //conversation_uuid: convId // ✅ ADD THIS: Locks the message to this chat
+//     };
+
+//     setMessages((prev) => [...prev, userMessage]);
+
+//     const filesToSend = attachments.map((a) => a.file);
+
+//     setChatInput("");
+//     attachments.forEach((a) => {
+//       if (a.previewUrl) {
+//         URL.revokeObjectURL(a.previewUrl);
+//       }
+//     });
+//     setAttachments([]);
+
+//     setChatLoading(true);
+//     setIsTyping(false);
+
+//     try {
+//       let response;
+      
+//       if (filesToSend.length > 0) {
+//         response = await sendMessageWithFiles(convId, text, filesToSend);
+//       } else {
+//         response = await sendMessage(convId, text);
+//       }
+
+//       const assistantMessage = {
+//         sender: response.role || "assistant",
+//         text: response.content,
+//         timestamp: response.timestamp || new Date().toISOString(),
+//       };
+
+//       setMessages((prev) => {
+//         const updatedMessages = [...prev, assistantMessage];
+        
+//         // ✅ SAVE updated messages to conversation
+//         if (onSaveMessages) {
+//           onSaveMessages(convId, updatedMessages);
+//         }
+        
+//         return updatedMessages;
+//         // // ✅ FIX: Deduplicate when appending the new AI response
+//         // const updatedMessages = removeDuplicates([...prev, assistantMessage]);
+        
+//         // if (onSaveMessages) {
+//         //   onSaveMessages(convId, updatedMessages);
+//         // }
+//         // return updatedMessages;
+//       });
+
+//       if (onConversationUpdate) {
+//         onConversationUpdate(convId);
+//       }
+      
+//     } catch (err) {
+//       console.error("Chat error:", err);
+//       setMessages((prev) => prev.filter((m) => m.tempId !== tempId));
+//       setChatInput(text);
+//       alert(err.message || "Failed to send message. Please try again.");
+//     } finally {
+//       setChatLoading(false);
+//     }
+//   }
+
+  async function handleSend(passedText) {
     const textRaw = passedText ?? chatInput;
     const text = (textRaw || "").trim();
-
+ 
     if (!text && attachments.length === 0) return;
     if (chatLoading) return;
-
+ 
     let convId = currentConversation?.conversation_uuid;
-
+ 
     if (!convId || currentConversation?.isNew) {
       try {
         if (!selectedProject) {
@@ -1823,7 +1928,7 @@ async function handleSend(passedText) {
         }
         const newConvData = await startConversation(selectedProject);
         convId = newConvData.conversation_uuid;
-
+ 
         if (onNewChatCreated) {
           onNewChatCreated(newConvData);
         }
@@ -1833,26 +1938,25 @@ async function handleSend(passedText) {
         return;
       }
     }
-
+ 
     let displayText = text;
     if (attachments.length > 0) {
       const filesLabel = attachments.map((a) => `📎 ${a.name}`).join("\n");
       displayText = text ? `${text}\n\n${filesLabel}` : filesLabel;
     }
-
+ 
     const tempId = Date.now();
     const userMessage = {
       sender: "user",
       text: displayText,
       timestamp: new Date().toISOString(),
-      tempId
-      //conversation_uuid: convId // ✅ ADD THIS: Locks the message to this chat
+      tempId,
     };
-
+ 
     setMessages((prev) => [...prev, userMessage]);
-
+ 
     const filesToSend = attachments.map((a) => a.file);
-
+ 
     setChatInput("");
     attachments.forEach((a) => {
       if (a.previewUrl) {
@@ -1860,47 +1964,60 @@ async function handleSend(passedText) {
       }
     });
     setAttachments([]);
-
+ 
     setChatLoading(true);
     setIsTyping(false);
-
+ 
     try {
       let response;
-      
+      setMessages(prev => [
+  ...prev,
+  {
+    sender: "assistant",
+    text: "",                 // placeholder
+    timestamp: new Date().toISOString(),
+    _local: true              // optional flag
+  }
+]);
+ 
       if (filesToSend.length > 0) {
         response = await sendMessageWithFiles(convId, text, filesToSend);
       } else {
         response = await sendMessage(convId, text);
       }
-
-      const assistantMessage = {
-        sender: response.role || "assistant",
-        text: response.content,
-        timestamp: response.timestamp || new Date().toISOString(),
-      };
-
+ 
+      // setMessages((prev) => {
+      //   const updatedMessages = [...prev, assistantMessage];
+ 
+      //   // ✅ SAVE updated messages to conversation
+      //   if (onSaveMessages) {
+      //     onSaveMessages(convId, updatedMessages);
+      //   }
+ 
+      //   return updatedMessages;
+      // });
+ 
       setMessages((prev) => {
-        const updatedMessages = [...prev, assistantMessage];
-        
-        // ✅ SAVE updated messages to conversation
-        if (onSaveMessages) {
-          onSaveMessages(convId, updatedMessages);
-        }
-        
-        return updatedMessages;
-        // // ✅ FIX: Deduplicate when appending the new AI response
-        // const updatedMessages = removeDuplicates([...prev, assistantMessage]);
-        
-        // if (onSaveMessages) {
-        //   onSaveMessages(convId, updatedMessages);
-        // }
-        // return updatedMessages;
-      });
-
+  const updated = [...prev];
+ 
+  // replace the last assistant placeholder instead of appending
+  updated[updated.length - 1] = {
+    sender: "assistant",
+    text: response.content,
+    timestamp: response.timestamp || new Date().toISOString(),
+  };
+ 
+  if (onSaveMessages) {
+    onSaveMessages(convId, updated);
+  }
+ 
+  return updated;
+});
+ 
+ 
       if (onConversationUpdate) {
         onConversationUpdate(convId);
       }
-      
     } catch (err) {
       console.error("Chat error:", err);
       setMessages((prev) => prev.filter((m) => m.tempId !== tempId));
@@ -1909,7 +2026,7 @@ async function handleSend(passedText) {
     } finally {
       setChatLoading(false);
     }
-  }
+}
 
 
   // Handle first message from home screen
