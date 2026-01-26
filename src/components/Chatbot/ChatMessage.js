@@ -267,19 +267,19 @@ const ChatMessage = ({ message, sender, timestamp }) => {
 
         // 3. Sentence Deduplication (Cleanup for other small repetitions)
         text = text.replace(/\.FOUND/g, ". "); 
-        // const sentences = text.split(/(?<=\.)\s+/g); 
-        // const uniqueSentences = new Set();
-        // const cleanSentences = [];
+        const sentences = text.split(/(?<=\.)\s+/g); 
+        const uniqueSentences = new Set();
+        const cleanSentences = [];
 
-        // sentences.forEach(s => {
-        //      const trimmed = s.trim();
-        //      if (trimmed && !uniqueSentences.has(trimmed)) {
-        //          uniqueSentences.add(trimmed);
-        //          cleanSentences.push(trimmed);
-        //      }
-        // });
+        sentences.forEach(s => {
+             const trimmed = s.trim();
+             if (trimmed && !uniqueSentences.has(trimmed)) {
+                 uniqueSentences.add(trimmed);
+                 cleanSentences.push(trimmed);
+             }
+        });
 
-        // text = cleanSentences.join(" ");
+        text = cleanSentences.join(" ");
 
         // --- STEP C: RESTORE REFERENCES ---
         if (references) {
