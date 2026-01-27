@@ -1235,7 +1235,7 @@ const Chatbot = ({
               fontWeight: 600,
             }}
           >
-            ← Click "New Chat" to begin
+            ← Click Here to ask your Query to SVAYAM
           </Typography>
         </Box>
       </Box>
@@ -1568,14 +1568,10 @@ const Chatbot = ({
           }}
         >
           {[
-            "Explain SAP ABAP BAPI with an example.",
-            "How to debug an SAP workflow issue?",
-            "MM - How to fix PR to PO conversion error?",
-            "What is IDoc error 51 and how to reprocess it?",
-            "How to improve SELECT queries performance in ABAP?",
-            "FI - How to troubleshoot FB60 posting error?",
-            "Explain SAP SmartForms vs Adobe Forms.",
-            "Steps to configure Output Determination in SAP.",
+            "G5 root certificate.",
+            "How to renew CPI certification?",
+            "Tell me Enhancement to complete the service request check list step based on the CS order technical completion.",
+            "SEWA technical details?",
           ].map((prompt, idx) => (
             <Box
               key={idx}

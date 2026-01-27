@@ -57,13 +57,13 @@ const ChatMessage = ({ message, sender, timestamp, onResolved }) => {
         text = text.replace(/\{[\s\S]*?"answer_status"[\s\S]*?\}/gi, "");
       }
 
-      // 1. Remove Processing/Query tags
+      //1. Remove Processing/Query tags
       text = text.replace(
         /^(_?PROCESSING|QUERY(_PROCESSING)?|GREETING|QUERY)\s*/i,
         "",
       );
 
-      // 2. Remove Markdown Code Block Wrappers
+      //2. Remove Markdown Code Block Wrappers
       text = text.replace(/```json[\s\S]*?```/gi, "");
       text = text.replace(/```json/gi, "");
       text = text.replace(/```/g, "");
@@ -235,6 +235,14 @@ const ChatMessage = ({ message, sender, timestamp, onResolved }) => {
                 onResolved?.(true);
               }}
               sx={{ fontWeight: 600 }}
+            />
+            <Chip
+              label="Continue to chat"
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                onResolved?.(false);
+              }}
             />
           </Box>
         )}

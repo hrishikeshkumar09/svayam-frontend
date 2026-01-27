@@ -10,7 +10,7 @@ export const getAnalytics = async () => {
   
   // Use relative path if you have a proxy, otherwise absolute
   // We use the absolute URL to match your backend config
-  const API_URL = "http://localhost:8000/api/admin/analytics";
+  const API_URL = "https://svayam-argkayfnckeccqd6.southindia-01.azurewebsites.net/api/admin/analytics";
 
   const response = await fetch(API_URL, {
     method: "GET",

@@ -677,7 +677,7 @@ const UserSidebar = ({
             "&:hover": { background: isLoading ? "#e2e8f0" : "linear-gradient(135deg, #5568d3 0%, #6941a8 100%)", transform: isLoading ? "none" : "translateY(-2px)" },
           }}
         >
-          New chat
+          Ask Svayam
         </Button>
       </Box>
     </Drawer>
