@@ -691,8 +691,99 @@ export async function getAllUsers() {
   ------------------------------------------------- */
   const KB_BASE_URL = 'https://svayam-argkayfnckeccqd6.southindia-01.azurewebsites.net/api/kb';
 
-  export async function getKnowledgeBaseTree() {
-    return authorizedFetch(`${KB_BASE_URL}/`);
+  // export async function getKnowledgeBaseTree() {
+  //   return authorizedFetch(`${KB_BASE_URL}/`);
+  // }
+
+  // export async function getDownloadUrl(blobName) {
+  //   const url = `${KB_BASE_URL}/download-url?blob_name=${encodeURIComponent(blobName)}`;
+  //   return authorizedFetch(url);
+  // }
+
+  // export async function renameKbItem(payload) {
+  //   return authorizedFetch(`${KB_BASE_URL}/rename`, {
+  //     method: "PUT",
+  //     body: JSON.stringify(payload),
+  //   });
+  // }
+
+  // export async function deleteKbItem(payload) {
+  //   return authorizedFetch(`${KB_BASE_URL}/delete`, {
+  //     method: "DELETE",
+  //     body: JSON.stringify(payload),
+  //   });
+  // }
+
+  // export function uploadKbFiles(formData, onProgress) {
+  //   return new Promise((resolve, reject) => {
+  //     const token = localStorage.getItem("token");
+  //     const xhr = new XMLHttpRequest();
+
+  //     xhr.open("POST", `${KB_BASE_URL}/upload-files`);
+  //     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+
+  //     xhr.upload.onprogress = (event) => {
+  //       if (event.lengthComputable && onProgress) {
+  //         const percent = Math.round((event.loaded / event.total) * 100);
+  //         onProgress(percent);
+  //       }
+  //     };
+
+  //     xhr.onload = () => {
+  //       try {
+  //         const res = JSON.parse(xhr.responseText);
+  //         if (xhr.status >= 200 && xhr.status < 300) {
+  //           resolve(res);
+  //         } else {
+  //           reject(new Error(res.detail || "Upload failed"));
+  //         }
+  //       } catch {
+  //         reject(new Error("Upload error"));
+  //       }
+  //     };
+
+  //     xhr.onerror = () => reject(new Error("Network upload error"));
+  //     xhr.send(formData);
+  //   });
+  // }
+
+  // export async function createProject(projectName) {
+  //    return authorizedFetch(`${KB_BASE_URL}/create-project`, {
+  //      method: 'POST',
+  //      body: JSON.stringify({ project_name: projectName }),
+  //    });
+  // }
+
+  // // ✅ ADD THIS FUNCTION HERE
+  // // This uses authorizedFetch so it handles the token automatically
+  // export async function fetchContainers() {
+  //   return authorizedFetch(`${KB_BASE_URL}/containers`);
+  // }
+
+  // export async function triggerKbIndexer() {
+  //   // Assuming indexer endpoint is on same backend or separate
+  //   return authorizedFetch(`${process.env.REACT_APP_AZURE_KB_API || 'http://localhost:8000'}/search/run-indexer`, {
+  //     method: "POST",
+  //   });
+  // }
+
+  export async function getKnowledgeBaseTree(projectName) {
+    //return authorizedFetch(`${KB_BASE_URL}/`);
+
+    //return authorizedFetch(`${KB_BASE_URL}/?t=${new Date().getTime()}`);
+    const params = new URLSearchParams();
+
+    // 2. Add the project name if it exists (CRITICAL FIX)
+    if (projectName) {
+      params.append("project", projectName);
+    }
+
+    // 3. Add the timestamp to bust the browser cache
+    params.append("t", new Date().getTime());
+
+    // 4. Send the request with the query string
+    // Result looks like: /api/kb/?project=MyProject&t=1738592000123
+    return authorizedFetch(`${KB_BASE_URL}/?${params.toString()}`);
   }
 
   export async function getDownloadUrl(blobName) {
@@ -700,17 +791,43 @@ export async function getAllUsers() {
     return authorizedFetch(url);
   }
 
-  export async function renameKbItem(payload) {
+  // export async function renameKbItem(payload) {
+  //   return authorizedFetch(`${KB_BASE_URL}/rename`, {
+  //     method: "PUT",
+  //     body: JSON.stringify(payload),
+  //   });
+  // }
+  // ✅ FIX: Accept 4 arguments to match what the UI sends
+  export async function renameKbItem(old_path, new_name, type, project_name) {
     return authorizedFetch(`${KB_BASE_URL}/rename`, {
       method: "PUT",
-      body: JSON.stringify(payload),
+      // Construct the correct JSON object for the Backend
+      body: JSON.stringify({
+        old_path: old_path,
+        new_name: new_name,
+        type: type,
+        project_name: project_name
+      }),
     });
   }
 
-  export async function deleteKbItem(payload) {
+  // export async function deleteKbItem(payload) {
+  //   return authorizedFetch(`${KB_BASE_URL}/delete`, {
+  //     method: "DELETE",
+  //     body: JSON.stringify(payload),
+  //   });
+  // }
+
+  // ✅ FIX: Accept 3 arguments to match what the UI sends
+  export async function deleteKbItem(path, type, project_name) {
     return authorizedFetch(`${KB_BASE_URL}/delete`, {
       method: "DELETE",
-      body: JSON.stringify(payload),
+      // Construct the correct JSON object for the Backend
+      body: JSON.stringify({
+        path: path,
+        type: type,
+        project_name: project_name 
+      }),
     });
   }
 
@@ -760,10 +877,24 @@ export async function getAllUsers() {
     return authorizedFetch(`${KB_BASE_URL}/containers`);
   }
 
-  export async function triggerKbIndexer() {
-    // Assuming indexer endpoint is on same backend or separate
-    return authorizedFetch(`${process.env.REACT_APP_AZURE_KB_API || 'http://localhost:8000'}/search/run-indexer`, {
+  // export async function triggerKbIndexer() {
+  //   // Assuming indexer endpoint is on same backend or separate
+  //   return authorizedFetch(`${KB_BASE_URL}/search/run-indexer`, {
+  //     method: "POST",
+  //   });
+  // }
+
+  // ✅ FIX: Accept project_name to call the new endpoint correctly
+  export async function triggerKbIndexer(project_name) {
+    if (!project_name) {
+        console.warn("Indexer called without project name.");
+        return; 
+    }
+    return authorizedFetch(`${KB_BASE_URL}/search/run-indexer`, {
       method: "POST",
+      body: JSON.stringify({ 
+          project_name: project_name 
+      }),
     });
   }
 
