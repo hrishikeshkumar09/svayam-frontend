@@ -778,17 +778,25 @@ const handleDeleteConversation = async (uuid) => {
                     {/* --- ROW 2: AI / LangSmith Stats (Your Enhancements) --- */}
                     <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: '#64748b' }}>AI Performance (Last 7 Days)</Typography>
                     <Grid container spacing={3}>
-                      <Grid item xs={12} sm={6} md={3}>
+                      <Grid item xs={12} sm={6} md={2.4}>
                         <StatCard title="AI Interactions" value={llmStats.total_requests} icon={<ArticleIcon fontSize="large" />} color="#8b5cf6" />
                       </Grid>
-                      <Grid item xs={12} sm={6} md={3}>
+                      <Grid item xs={12} sm={6} md={2.4}>
                         <StatCard title="Tokens Used" value={llmStats.total_tokens.toLocaleString()} icon={<PsychologyIcon fontSize="large" />} color="#ec4899" />
                       </Grid>
-                      <Grid item xs={12} sm={6} md={3}>
+                      <Grid item xs={12} sm={6} md={2.4}>
                         <StatCard title="Est. Cost" value={`$${llmStats.total_cost}`} icon={<AttachMoneyIcon fontSize="large" />} color="#22c55e" />
                       </Grid>
-                      <Grid item xs={12} sm={6} md={3}>
+                      <Grid item xs={12} sm={6} md={2.4}>
                         <StatCard title="Avg Latency" value={`${llmStats.avg_latency}s`} icon={<SpeedIcon fontSize="large" />} color="#f97316" />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={2.4}>
+                        <StatCard 
+                          title="Total LLM Calls" 
+                          value={llmStats.total_llm_calls} 
+                          icon={<SmartToyIcon fontSize="large" />} 
+                          color="#ef4444" // Red color
+                        />
                       </Grid>
                     </Grid>
 

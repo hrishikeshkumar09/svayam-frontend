@@ -539,10 +539,31 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import Tooltip from "@mui/material/Tooltip";
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
-const SIDEBAR_WIDTH = 260;
+const SIDEBAR_WIDTH = 300;
 
 // ❌ REMOVED: export const PROJECT_OPTIONS = [...] 
 // We no longer hardcode this.
+
+const formatLocalDate = (isoString) => {
+  if (!isoString) return "";
+  
+  // 1. Force UTC interpretation if 'Z' is missing
+  let dateStr = isoString;
+  if (!dateStr.endsWith("Z") && !dateStr.includes("+")) {
+    dateStr += "Z"; 
+  }
+
+  const date = new Date(dateStr);
+  
+  // 2. Convert to User's Local Time (IST)
+  return date.toLocaleString('en-US', {
+    month: 'short', 
+    day: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: true 
+  });
+};
 
 // Loading Skeleton Component
 const ConversationSkeleton = () => (
@@ -651,7 +672,8 @@ const UserSidebar = ({
                   </Typography>
                 </Tooltip>
                 <Typography sx={{ fontSize: "0.72rem", color: "#94a3b8", mt: 0.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {new Date(conv.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  {/* {new Date(conv.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })} */}
+                  {formatLocalDate(conv.startDate)}
                 </Typography>
               </Box>
               <IconButton className="delete-icon" onClick={(e) => { e.stopPropagation(); onDeleteConversation(conv.conversation_uuid); }} sx={{ ml: 1, opacity: 0, visibility: "hidden", transform: "translateX(6px)", transition: "all 0.25s ease", width: 28, height: 28, borderRadius: "50%", "&:hover": { backgroundColor: "#ffecec" }, "& .MuiSvgIcon-root": { fontSize: 18, color: "#ef4444" } }}>

@@ -1535,7 +1535,7 @@ const Chatbot = ({
       </Box>
 
       {/* PROMPT GALLERY */}
-      <Box
+      {/* <Box
         sx={{
           position: "fixed",
           bottom: galleryOpen ? 0 : "-300px",
@@ -1592,7 +1592,100 @@ const Chatbot = ({
             </Box>
           ))}
         </Box>
-      </Box>
+      </Box> */}
+
+      {/* PROMPT GALLERY - FLOATING POPUP STYLE */}
+      <Fade in={galleryOpen} mountOnEnter unmountOnExit>
+        <Box
+          sx={{
+            position: "absolute", // Confines it to the relative parent (Chatbot container)
+            bottom: "80px",       // Floats above the input bar
+            left: "50%",          // Centers horizontally
+            transform: "translateX(-50%)", // Perfect centering
+            width: "90%",         // Responsive width
+            maxWidth: "800px",    // Maximum width for large screens
+            maxHeight: "300px",   // limit height
+            bgcolor: "rgba(255, 255, 255, 0.95)", // Glassmorphism background
+            backdropFilter: "blur(10px)",
+            borderRadius: "16px",
+            border: "1px solid rgba(0,0,0,0.08)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+            zIndex: 1000,
+            overflow: "hidden",   // Clip content to rounded corners
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {/* Header */}
+          <Box
+            sx={{
+              p: 2,
+              borderBottom: "1px solid rgba(0,0,0,0.05)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              bgcolor: "rgba(248, 250, 252, 0.8)",
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SearchIcon sx={{ color: "primary.main", fontSize: 20 }} />
+              <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+                Prompt Gallery
+              </Typography>
+            </Box>
+            <IconButton size="small" onClick={() => setGalleryOpen(false)}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+
+          {/* Content - Scrollable Grid */}
+          <Box
+            sx={{
+              p: 2,
+              overflowY: "auto",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: 1.5,
+            }}
+          >
+            {[
+              "G5 root certificate.",
+              "How to renew CPI certification?",
+              "SEWA technical details?",
+              "Tell me Enhancement to complete the service request check list step based on the CS order technical completion.",
+            ].map((prompt, idx) => (
+              <Box
+                key={idx}
+                onClick={() => {
+                  setChatInput(prompt);
+                  setGalleryOpen(false);
+                }}
+                sx={{
+                  p: 1.5,
+                  bgcolor: "white",
+                  borderRadius: "10px",
+                  border: "1px solid #e2e8f0",
+                  cursor: "pointer",
+                  transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                  display: "flex",
+                  alignItems: "center",
+                  "&:hover": {
+                    bgcolor: "#f0f9ff",
+                    borderColor: "#bae6fd",
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                  },
+                }}
+              >
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                  {prompt}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      </Fade>
+
     </Box>
   );
 };
