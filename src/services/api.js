@@ -797,8 +797,21 @@ export async function getAllUsers() {
     return authorizedFetch(`${KB_BASE_URL}/?${params.toString()}`);
   }
 
-  export async function getDownloadUrl(blobName) {
-    const url = `${KB_BASE_URL}/download-url?blob_name=${encodeURIComponent(blobName)}`;
+  // export async function getDownloadUrl(blobName) {
+  //   const url = `${KB_BASE_URL}/download-url?blob_name=${encodeURIComponent(blobName)}`;
+  //   return authorizedFetch(url);
+  // }
+
+  export async function getDownloadUrl(blobName, projectName = null) {
+    // 1. Create the base URL with the blob name
+    let url = `${KB_BASE_URL}/download-url?blob_name=${encodeURIComponent(blobName)}`;
+
+    // 2. Append the project name if it exists (CRITICAL FIX)
+    if (projectName) {
+      url += `&project=${encodeURIComponent(projectName)}`;
+    }
+
+    // 3. Fetch with authorization
     return authorizedFetch(url);
   }
 
