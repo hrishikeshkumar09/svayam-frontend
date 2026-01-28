@@ -225,7 +225,7 @@ function App() {
               const userInfo = JSON.parse(userInfoStr);
               const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
 
-              await getUserConversations(null); // Verify token
+              //await getUserConversations(null); // Verify token
 
               const restoredUser = {
                 userDetails: userInfo.email,
@@ -239,7 +239,7 @@ function App() {
 
             } catch (err) {
               console.warn("Session restoration failed:", err);
-              handleLogoutLocal();
+              //handleLogoutLocal();
             }
           } else {
             setIsLoadingConversations(false);
