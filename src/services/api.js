@@ -471,8 +471,14 @@ const API_BASE_URL = 'https://svayam-argkayfnckeccqd6.southindia-01.azurewebsite
   async function authorizedFetch(url, options = {}) {
     let token = localStorage.getItem("token");
 
+    // if (!token) {
+    //   throw new Error("No access token available");
+    // }
     if (!token) {
-      throw new Error("No access token available");
+      token = await refreshAccessToken();
+      if (!token) {
+        throw new Error("Session expired. Please log in again.");
+      }
     }
 
     options.headers = {
