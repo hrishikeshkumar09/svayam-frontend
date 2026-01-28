@@ -213,56 +213,132 @@ function App() {
   };
 
   // --- Authentication check on mount ---
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+  //         const token = localStorage.getItem("token");
+  //         const userInfoStr = localStorage.getItem("user_info");
+
+  //         if (token && userInfoStr) {
+  //           try {
+  //             const userInfo = JSON.parse(userInfoStr);
+  //             const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
+
+  //             await getUserConversations(null); // Verify token
+
+  //             const restoredUser = {
+  //               userDetails: userInfo.email,
+  //               role: userInfo.role,
+  //               sessionId: sessionId,
+  //             };
+
+  //             setMockUser(restoredUser);
+  //             localStorage.setItem("session_id", sessionId);
+  //             await loadProjectsForUser(userInfo.email);
+
+  //           } catch (err) {
+  //             console.warn("Session restoration failed:", err);
+  //             handleLogoutLocal();
+  //           }
+  //         } else {
+  //           setIsLoadingConversations(false);
+  //         }
+  //         setUserData(null);
+  //         setIsLoadingUser(false);
+  //         return;
+  //       }
+
+  //       // Production Auth
+  //       const response = await fetch("/.auth/me");
+  //       const data = await response.json();
+  //       const principal = data.clientPrincipal;
+
+  //       if (principal) {
+  //         const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
+  //         localStorage.setItem("session_id", sessionId);
+  //         setUserData({ ...principal, sessionId });
+  //         await loadProjectsForUser(principal.userDetails);
+  //       } else {
+  //         setUserData(null);
+  //         setIsLoadingConversations(false);
+  //       }
+  //     } catch (err) {
+  //       setUserData(null);
+  //       setIsLoadingConversations(false);
+  //     } finally {
+  //       setIsLoadingUser(false);
+  //     }
+  //   })();
+  // }, []);
+
+  // --- Authentication check on mount (Universal) ---
   useEffect(() => {
     (async () => {
       try {
-        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-          const token = localStorage.getItem("token");
-          const userInfoStr = localStorage.getItem("user_info");
+        // ------------------------------------------------------------------
+        // 1. Check for Local Token FIRST (Works on Localhost AND Azure)
+        // ------------------------------------------------------------------
+        const token = localStorage.getItem("token");
+        const userInfoStr = localStorage.getItem("user_info");
 
-          if (token && userInfoStr) {
-            try {
-              const userInfo = JSON.parse(userInfoStr);
-              const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
+        if (token && userInfoStr) {
+          try {
+            const userInfo = JSON.parse(userInfoStr);
+            const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
 
-              //await getUserConversations(null); // Verify token
+            // 🔴 SKIPPED ON REFRESH (As requested): 
+            // This prevents auto-logout if the backend is slow or restarting.
+            // await getUserConversations(null); 
 
-              const restoredUser = {
-                userDetails: userInfo.email,
-                role: userInfo.role,
-                sessionId: sessionId,
-              };
+            const restoredUser = {
+              userDetails: userInfo.email,
+              role: userInfo.role,
+              sessionId: sessionId,
+            };
 
-              setMockUser(restoredUser);
-              localStorage.setItem("session_id", sessionId);
-              await loadProjectsForUser(userInfo.email);
+            setMockUser(restoredUser);
+            localStorage.setItem("session_id", sessionId);
+            
+            // Attempt to load projects in background (don't block UI if it fails)
+            await loadProjectsForUser(userInfo.email).catch(e => console.warn("Background project load failed", e));
+            
+            // ✅ We found a valid session, stop here.
+            setUserData(null);
+            setIsLoadingUser(false);
+            return; 
 
-            } catch (err) {
-              console.warn("Session restoration failed:", err);
-              //handleLogoutLocal();
-            }
-          } else {
-            setIsLoadingConversations(false);
+          } catch (err) {
+            console.warn("Token restoration failed:", err);
+            // Only force logout if JSON parsing failed or critical data is missing
+            handleLogoutLocal();
           }
-          setUserData(null);
-          setIsLoadingUser(false);
-          return;
         }
 
-        // Production Auth
+        // ------------------------------------------------------------------
+        // 2. Fallback: Azure Easy Auth (Only if no local token found)
+        // ------------------------------------------------------------------
+        // This only runs if the user cleared their cache or never logged in.
         const response = await fetch("/.auth/me");
-        const data = await response.json();
-        const principal = data.clientPrincipal;
-
-        if (principal) {
-          const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
-          localStorage.setItem("session_id", sessionId);
-          setUserData({ ...principal, sessionId });
-          await loadProjectsForUser(principal.userDetails);
+        if (response.ok) {
+            const data = await response.json();
+            const principal = data.clientPrincipal;
+    
+            if (principal) {
+              const sessionId = localStorage.getItem("session_id") || crypto.randomUUID();
+              localStorage.setItem("session_id", sessionId);
+              setUserData({ ...principal, sessionId });
+              await loadProjectsForUser(principal.userDetails);
+            } else {
+              setUserData(null);
+              setIsLoadingConversations(false);
+            }
         } else {
-          setUserData(null);
-          setIsLoadingConversations(false);
+            // No token, no Azure Auth -> User is Guest
+            setUserData(null);
+            setIsLoadingConversations(false);
         }
+
       } catch (err) {
         setUserData(null);
         setIsLoadingConversations(false);
