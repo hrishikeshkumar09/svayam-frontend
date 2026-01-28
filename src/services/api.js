@@ -477,7 +477,9 @@ const API_BASE_URL = 'https://svayam-argkayfnckeccqd6.southindia-01.azurewebsite
     if (!token) {
       token = await refreshAccessToken();
       if (!token) {
-        throw new Error("Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("refresh_token");
+        throw new Error("Session expired");
       }
     }
 
@@ -496,7 +498,10 @@ const API_BASE_URL = 'https://svayam-argkayfnckeccqd6.southindia-01.azurewebsite
       const newToken = await refreshAccessToken();
       
       if (!newToken) {
-        throw new Error("Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("refresh_token");
+        throw new Error("Session expired");
+        //throw new Error("Session expired. Please log in again.");
       }
 
       options.headers.Authorization = `Bearer ${newToken}`;

@@ -1205,12 +1205,12 @@ const Chatbot = ({
               fontWeight: 800,
               color: "#1e293b", // Dark text since background is light now
               letterSpacing: "3px",
-              textTransform: "uppercase",
+              //textTransform: "uppercase",
               textShadow: "0px 2px 10px rgba(0,0,0,0.05)",
               mb: 1,
             }}
           >
-            SVAYAM AMS
+            iResolver - Copilot
           </Typography>
 
           <Typography
@@ -1221,7 +1221,7 @@ const Chatbot = ({
               letterSpacing: "1px",
             }}
           >
-            AI-Powered Enterprise Assistance
+            AI-Powered Intelligent Support Assistant
           </Typography>
 
           <Typography
@@ -1230,12 +1230,12 @@ const Chatbot = ({
               display: "block",
               mt: 4,
               color: "#94a3b8",
-              textTransform: "uppercase",
+              //textTransform: "uppercase",
               letterSpacing: "1.5px",
               fontWeight: 600,
             }}
           >
-            ← Click Here to ask your Query to SVAYAM
+            ← Click Here to ask your Query to iResolver
           </Typography>
         </Box>
       </Box>
@@ -1650,7 +1650,6 @@ const Chatbot = ({
           >
             {[
               "G5 root certificate.",
-              "How to renew CPI certification?",
               "SEWA technical details?",
               "Tell me Enhancement to complete the service request check list step based on the CS order technical completion.",
             ].map((prompt, idx) => (

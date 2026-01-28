@@ -27,7 +27,7 @@ import {
 
 // --- RECHARTS IMPORTS (Your Analytics Graphs) ---
 import { 
-  ComposedChart, AreaChart, Area, Bar, XAxis, YAxis, CartesianGrid, 
+  ComposedChart, AreaChart, Area, Bar, XAxis, YAxis, CartesianGrid, BarChart,
   Tooltip as RechartsTooltip, Legend, ResponsiveContainer, Line, ReferenceLine
 } from 'recharts';
 import { PieChart, Pie } from "recharts";
@@ -688,13 +688,13 @@ const handleDeleteConversation = async (uuid) => {
       <CssBaseline />
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, bgcolor: '#ffffff', boxShadow: "0 2px 12px rgba(0,0,0,0.08)", borderBottom: "1px solid #e5e7eb" }} elevation={0}>
         <Toolbar>
-          {currentUserRole === 'user' && (
-            <IconButton onClick={() => setSidebarOpen(!sidebarOpen)} sx={{ mr: 2 }}><MenuIcon /></IconButton>
-          )}
+          {/* {currentUserRole === 'user' && (
+            <IconButton onClick={() => setSidebarOpen(!sidebarOpen)} sx={{ mr: 2 }}></IconButton>
+          )} */}
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Stack direction="row" alignItems="center" spacing={1}>
               <img src={customLogo} alt="Logo" style={{ height: 32 }} />
-              <Typography variant="h6" color="primary" fontWeight="bold">SVAYAM-AMS</Typography>
+              <Typography variant="h5" color="primary" fontWeight="bold">iResolver - Copilot</Typography>
             </Stack>
             <Stack direction="row" spacing={2} alignItems="center">
               <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
@@ -823,8 +823,38 @@ const handleDeleteConversation = async (uuid) => {
                           </ResponsiveContainer>
                         </Paper>
                       </Grid>
-                      {/* Graph 2: Tokens */}
+                      {/* Graph 2: Daily LLM Invocations */}
                       <Grid item xs={12} md={6} width={700}>
+                      <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid #e2e8f0', mb: 3 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#1e293b', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                          🤖 Daily LLM Calls
+                        </Typography>
+                        
+                        <Box sx={{ height: 300, width: '100%' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={llmStats.daily_trends} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                              <XAxis dataKey="date" tick={{fontSize: 12, fill: '#64748b'}} tickFormatter={(str) => str.slice(5)} axisLine={false} tickLine={false} dy={10} />
+                              
+                              {/* Y-Axis for LLM Calls */}
+                              <YAxis orientation="left" stroke="#ef4444" tick={{fontSize: 12, fill: '#ef4444'}} axisLine={false} tickLine={false} width={40} />
+                              
+                              <RechartsTooltip 
+                                contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} 
+                                labelStyle={{ fontWeight: 600, color: '#1e293b' }} 
+                                cursor={{ fill: '#fee2e2' }} // Light red hover effect
+                              />
+                              <Legend verticalAlign="top" height={36} iconType="circle" />
+
+                              {/* Red Bar: LLM Calls */}
+                              <Bar dataKey="llm_calls" name="LLM Generations" fill="#ef4444" radius={[6, 6, 0, 0]} barSize={40} fillOpacity={0.9} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </Box>
+                      </Paper>
+                      </Grid>
+                      {/* Graph 2: Tokens */}
+                      {/* <Grid item xs={12} md={6} width={700}>
                         <Paper sx={{ p: 3, borderRadius: 3, height: 450, with: 700, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
                           <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: '#1e293b' }}>
                             Daily Token Usage
@@ -846,7 +876,7 @@ const handleDeleteConversation = async (uuid) => {
                             </AreaChart>
                           </ResponsiveContainer>
                         </Paper>
-                      </Grid>
+                      </Grid> */}
                     </Grid>
                  </Box>
               )}

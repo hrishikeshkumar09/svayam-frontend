@@ -625,7 +625,7 @@ const UserSidebar = ({
               projects.map((project) => (
 <MenuItem key={project.project_uuid} value={project.project_uuid} sx={{ gap: 1.5 }}>
   <AccountTreeIcon sx={{ fontSize: 18, color: "#64748b" }} />
-  {project.display_name}  {/* Use display_name instead of name */}
+  {project.display_name === "svayamams" ? "SEWA" : project.display_name}  {/* Use display_name instead of name */}
 </MenuItem>
               ))
             ) : (
@@ -699,7 +699,7 @@ const UserSidebar = ({
             "&:hover": { background: isLoading ? "#e2e8f0" : "linear-gradient(135deg, #5568d3 0%, #6941a8 100%)", transform: isLoading ? "none" : "translateY(-2px)" },
           }}
         >
-          Ask Svayam
+          Ask iResolver
         </Button>
       </Box>
     </Drawer>

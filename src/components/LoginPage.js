@@ -227,7 +227,7 @@ const LoginPage = ({ onLogin }) => {
           />
 
           <Typography variant="h3" fontWeight={800}>
-            SVAYAM-AMS
+            iResolver - Copilot
           </Typography>
 
           <Typography
@@ -239,7 +239,7 @@ const LoginPage = ({ onLogin }) => {
               fontWeight: 400,
             }}
           >
-            Intelligent Support Specialist
+            Intelligent Support Assistant
           </Typography>
 
           <Typography
@@ -250,8 +250,10 @@ const LoginPage = ({ onLogin }) => {
               fontSize: "17px",
             }}
           >
-            Empower your organization with seamless AI-powered support,
-            real-time insights, and integrated enterprise workflow automation.
+            {/* Empower your organization with seamless AI-powered support,
+            real-time insights, and integrated enterprise workflow automation. */}
+            Revolutionize your helpdesk with iResolver - Copilot by integrating intelligent ticket resolution, 
+            instant knowledge retrieval, and real-time operational analytics.
           </Typography>
         </Box>
       </Box>

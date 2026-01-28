@@ -144,7 +144,7 @@ const Header = () => {
             letterSpacing: '-0.02em',
           }}
         >
-          SVAYAM-AMS
+          iResolver - Copilot
         </Typography>
       </Stack>
     </Box>
